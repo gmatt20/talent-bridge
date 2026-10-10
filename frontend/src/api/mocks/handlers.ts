@@ -249,7 +249,7 @@ route('POST', '/api/auth/register', ({ body }): AuthResponse => {
   if (!['organization', 'student', 'mentor'].includes(role)) throw new ApiError(400, 'Choose a role.')
   const name = requireString(body, 'name', 'Name')
   const email = requireString(body, 'email', 'Email').toLowerCase()
-  const password = requireString(body, 'password', 'Password')
+  const password = requireString(body, 'password_hash', 'Password')
   if (password.length < 8) throw new ApiError(400, 'Password must be at least 8 characters.')
   if (db.users.some((u) => u.email === email)) throw new ApiError(409, 'An account with this email already exists.')
 
@@ -263,7 +263,7 @@ route('POST', '/api/auth/register', ({ body }): AuthResponse => {
 
 route('POST', '/api/auth/login', ({ body }): AuthResponse => {
   const email = String(body.email ?? '').trim().toLowerCase()
-  const user = db.users.find((u) => u.email === email && u.password === body.password)
+  const user = db.users.find((u) => u.email === email && u.password === body.password_hash)
   if (!user) throw new ApiError(401, 'Invalid email or password.')
   return { token: `mock.${user.id}`, user: toUser(user) }
 })

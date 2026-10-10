@@ -61,7 +61,7 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 
 ```json
 // request
-{ "role": "organization", "email": "info@habitatoc.org", "password": "pass1234", "name": "Habitat for Humanity OC" }
+{ "role": "organization", "email": "info@habitatoc.org", "password_hash": "pass1234", "name": "Habitat for Humanity OC" }
 // role: "organization" | "student" | "mentor"
 
 // response 201

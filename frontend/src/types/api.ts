@@ -18,13 +18,13 @@ export interface AuthResponse {
 export interface RegisterRequest {
   role: Role
   email: string
-  password: string
+  password_hash: string
   name: string
 }
 
 export interface LoginRequest {
   email: string
-  password: string
+  password_hash: string
 }
 
 export interface Skill {

@@ -1,0 +1,186 @@
+{
+  "skills": [
+    {"id": 1, "name": "React"},
+    {"id": 2, "name": "TypeScript"},
+    {"id": 3, "name": "Python"},
+    {"id": 4, "name": "FastAPI"},
+    {"id": 5, "name": "PostgreSQL"},
+    {"id": 6, "name": "UI Design"},
+    {"id": 7, "name": "Figma"},
+    {"id": 8, "name": "Node.js"},
+    {"id": 9, "name": "Mobile Development"},
+    {"id": 10, "name": "Data Analysis"},
+    {"id": 11, "name": "Machine Learning"},
+    {"id": 12, "name": "Project Management"},
+    {"id": 13, "name": "Web Development"},
+    {"id": 14, "name": "Accessibility"},
+    {"id": 15, "name": "Content Writing"},
+    {"id": 16, "name": "QA Testing"},
+    {"id": 17, "name": "DevOps"},
+    {"id": 18, "name": "AWS"},
+    {"id": 19, "name": "GraphQL"},
+    {"id": 20, "name": "Tailwind CSS"}
+  ],
+  "students": [
+    {
+      "id": 101, "name": "Ana Reyes",
+      "headline": "CS student at UCI, loves community tech",
+      "bio": "Second-year CS student. Built a React scheduling app for a campus club. Interested in web dev and civic tech.",
+      "availability": "10 hrs/week",
+      "rating": 4.8,
+      "skills": [{"id": 1, "name": "React"}, {"id": 2, "name": "TypeScript"}, {"id": 20, "name": "Tailwind CSS"}],
+      "interests": ["civic tech", "web development"],
+      "learning_goals": "Ship a production React app with real users."
+    },
+    {
+      "id": 102, "name": "Jordan Kim",
+      "headline": "Full-stack hobbyist at Saddleback College",
+      "bio": "Python and FastAPI backend work on side projects. Comfortable with SQL.",
+      "availability": "15 hrs/week",
+      "rating": 4.5,
+      "skills": [{"id": 3, "name": "Python"}, {"id": 4, "name": "FastAPI"}, {"id": 5, "name": "PostgreSQL"}],
+      "interests": ["backend engineering", "data"],
+      "learning_goals": "Deploy a backend to AWS."
+    },
+    {
+      "id": 103, "name": "Sam Patel",
+      "headline": "Designer transitioning to code",
+      "bio": "Figma power user. Teaching myself React. Did pro-bono UX for a local nonprofit.",
+      "availability": "8 hrs/week",
+      "rating": 4.6,
+      "skills": [{"id": 6, "name": "UI Design"}, {"id": 7, "name": "Figma"}, {"id": 14, "name": "Accessibility"}],
+      "interests": ["accessibility", "design systems"],
+      "learning_goals": "Build UI from scratch in React."
+    },
+    {
+      "id": 104, "name": "Riley Chen",
+      "headline": "Data student at UCI",
+      "bio": "Pandas, numpy, scikit-learn. Interested in community impact dashboards.",
+      "availability": "12 hrs/week",
+      "rating": 4.4,
+      "skills": [{"id": 3, "name": "Python"}, {"id": 10, "name": "Data Analysis"}, {"id": 11, "name": "Machine Learning"}],
+      "interests": ["social-impact data", "visualization"],
+      "learning_goals": "Deploy an ML-backed feature end-to-end."
+    },
+    {
+      "id": 105, "name": "Alex Nguyen",
+      "headline": "Mobile dev enthusiast",
+      "bio": "React Native side projects for local events. Beginner on backend.",
+      "availability": "6 hrs/week",
+      "rating": 4.2,
+      "skills": [{"id": 9, "name": "Mobile Development"}, {"id": 1, "name": "React"}, {"id": 2, "name": "TypeScript"}],
+      "interests": ["mobile", "events"],
+      "learning_goals": "Publish an app to the App Store."
+    },
+    {
+      "id": 106, "name": "Morgan Lee",
+      "headline": "QA + accessibility advocate",
+      "bio": "Volunteer accessibility auditor. Comfortable writing Playwright tests.",
+      "availability": "5 hrs/week",
+      "rating": 4.7,
+      "skills": [{"id": 16, "name": "QA Testing"}, {"id": 14, "name": "Accessibility"}, {"id": 13, "name": "Web Development"}],
+      "interests": ["accessibility", "testing"],
+      "learning_goals": "Write a CI test suite for a real app."
+    },
+    {
+      "id": 107, "name": "Priya Shah",
+      "headline": "Writer studying technical comms",
+      "bio": "Edits for the campus paper. Wrote onboarding docs for a startup internship.",
+      "availability": "8 hrs/week",
+      "rating": 4.5,
+      "skills": [{"id": 15, "name": "Content Writing"}, {"id": 12, "name": "Project Management"}],
+      "interests": ["technical writing", "nonprofit work"],
+      "learning_goals": "Produce user-facing docs that actually get read."
+    },
+    {
+      "id": 108, "name": "Diego Alvarez",
+      "headline": "Infra-curious CS junior",
+      "bio": "Set up a home Postgres + Grafana stack. Interested in DevOps and AWS.",
+      "availability": "10 hrs/week",
+      "rating": 4.3,
+      "skills": [{"id": 17, "name": "DevOps"}, {"id": 18, "name": "AWS"}, {"id": 5, "name": "PostgreSQL"}],
+      "interests": ["infrastructure", "cloud"],
+      "learning_goals": "Deploy a multi-service app to AWS."
+    },
+    {
+      "id": 109, "name": "Casey Brown",
+      "headline": "Beginner, eager to help",
+      "bio": "Finished intro to web dev. Looking for a real project to grow on.",
+      "availability": "4 hrs/week",
+      "rating": 4.0,
+      "skills": [{"id": 13, "name": "Web Development"}],
+      "interests": ["learning", "nonprofits"],
+      "learning_goals": "Make my first meaningful contribution to a project."
+    },
+    {
+      "id": 110, "name": "Taylor Okafor",
+      "headline": "Graph DB and APIs",
+      "bio": "Built a GraphQL layer over Postgres for a class project. Comfortable with Node.",
+      "availability": "10 hrs/week",
+      "rating": 4.6,
+      "skills": [{"id": 19, "name": "GraphQL"}, {"id": 8, "name": "Node.js"}, {"id": 5, "name": "PostgreSQL"}],
+      "interests": ["APIs", "backend"],
+      "learning_goals": "Design an API used by a real frontend."
+    }
+  ],
+  "mentors": [
+    {
+      "id": 201, "name": "David Kim",
+      "headline": "Senior web engineer, 10 yrs experience",
+      "bio": "Led frontend at two startups. Mentors students at Dreams for Schools.",
+      "availability": "4 hrs/week",
+      "skills": [{"id": 1, "name": "React"}, {"id": 2, "name": "TypeScript"}, {"id": 13, "name": "Web Development"}]
+    },
+    {
+      "id": 202, "name": "Elena Martinez",
+      "headline": "Backend engineer, Python + AWS",
+      "bio": "Builds APIs at a healthtech company. Volunteers for CIF.",
+      "availability": "3 hrs/week",
+      "skills": [{"id": 3, "name": "Python"}, {"id": 4, "name": "FastAPI"}, {"id": 18, "name": "AWS"}]
+    },
+    {
+      "id": 203, "name": "Marcus Johnson",
+      "headline": "Product designer, accessibility focus",
+      "bio": "20 yrs in design. Teaches accessibility workshops.",
+      "availability": "2 hrs/week",
+      "skills": [{"id": 6, "name": "UI Design"}, {"id": 7, "name": "Figma"}, {"id": 14, "name": "Accessibility"}]
+    },
+    {
+      "id": 204, "name": "Lin Zhao",
+      "headline": "ML engineer at a mapping company",
+      "bio": "Deploys ML services in production. Open to guiding one project per quarter.",
+      "availability": "3 hrs/week",
+      "skills": [{"id": 11, "name": "Machine Learning"}, {"id": 3, "name": "Python"}, {"id": 10, "name": "Data Analysis"}]
+    },
+    {
+      "id": 205, "name": "Alicia Nguyen",
+      "headline": "Engineering manager, dev tooling",
+      "bio": "Runs a small platform team. Enjoys helping students scope realistic projects.",
+      "availability": "4 hrs/week",
+      "skills": [{"id": 12, "name": "Project Management"}, {"id": 17, "name": "DevOps"}, {"id": 18, "name": "AWS"}]
+    }
+  ],
+  "projects": [
+    {
+      "id": 301,
+      "title": "Volunteer Scheduling App",
+      "description": "We are a Habitat-for-Humanity-style nonprofit. Volunteers currently sign up by phone for weekly build days, which eats hours of coordinator time. We want a simple web app where volunteers can see open build days, sign up with one click, and get a confirmation email. Admins need a view of who's coming.",
+      "deadline": "2026-12-01",
+      "organization_name": "Habitat for Humanity OC"
+    },
+    {
+      "id": 302,
+      "title": "Donor Impact Dashboard",
+      "description": "A food-pantry nonprofit wants a page where donors can see the real-world impact of their donations: meals served per month, families helped, categories of goods delivered. We have the data in a Google Sheet.",
+      "deadline": "2026-11-20",
+      "organization_name": "OC Food Share"
+    },
+    {
+      "id": 303,
+      "title": "Accessibility Audit + Fixes",
+      "description": "Our existing public site has accessibility issues reported by a user. We need someone to audit the site, document issues, and ship fixes for the top items — color contrast, keyboard nav, screen-reader labels.",
+      "deadline": "2026-11-05",
+      "organization_name": "Youth Mentors of OC"
+    }
+  ]
+}

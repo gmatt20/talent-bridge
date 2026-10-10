@@ -68,11 +68,35 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "token": "eyJhbGciOi...", "user": { "id": 1, "role": "organization", "email": "info@habitatoc.org", "name": "Habitat for Humanity OC" } }
 ```
 
+**Errors**
+
+```json
+// 400 — invalid role
+{ "error": "Choose a role." }
+
+// 400 — missing fields
+{ "error": "Name is required." }
+{ "error": "Email is required." }
+
+// 400 — invalid email
+{ "error": "Please enter a valid email address." }
+
+// 400 — password too short
+{ "error": "Password must be at least 8 characters." }
+
+// 409 — duplicate account
+{ "error": "An account with this email already exists." }
+{ "error": "An account with this name already exists." }
+
+// 422 — malformed body
+{ "error": "email: Field required" }
+```
+
 **`POST /api/auth/login`** — Authenticate.
 
 ```json
 // request
-{ "email": "info@habitatoc.org", "password": "pass1234" }
+{ "email": "info@habitatoc.org", "password_hash": "pass1234" }
 
 // response 200
 { "token": "eyJhbGciOi...", "user": { "id": 1, "role": "organization", "email": "info@habitatoc.org", "name": "Habitat for Humanity OC" } }

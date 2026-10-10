@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import psycopg
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -11,6 +12,8 @@ from ..deps import get_current_user, get_db
 router = APIRouter()
 
 VALID_ROLES = {"organization", "student", "mentor"}
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def _user_out(row: dict) -> dict:
@@ -33,12 +36,18 @@ def register(body: s.RegisterRequest, db: psycopg.Connection = Depends(get_db)):
         raise HTTPException(400, "Name is required.")
     if not email:
         raise HTTPException(400, "Email is required.")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(400, "Please enter a valid email address.")
     if len(body.password) < 8:
         raise HTTPException(400, "Password must be at least 8 characters.")
 
     existing = db.execute("SELECT 1 FROM users WHERE email = %s", (email,)).fetchone()
     if existing:
         raise HTTPException(409, "An account with this email already exists.")
+
+    existing = db.execute("SELECT 1 FROM users WHERE LOWER(name) = LOWER(%s)", (name,)).fetchone()
+    if existing:
+        raise HTTPException(409, "An account with this name already exists.")
 
     row = db.execute(
         "INSERT INTO users (role, email, password_hash, name) VALUES (%s, %s, %s, %s) "

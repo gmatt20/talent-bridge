@@ -80,8 +80,8 @@ export default function Login() {
       </form>
 
       {useMocks && (
-        <div className="mt-6 rounded-lg bg-accent/60 p-3 text-sm">
-          <p className="font-medium text-primary">Demo accounts</p>
+        <div className="mt-6 rounded-xl bg-accent p-3 text-sm">
+          <p className="eyebrow text-accent-foreground">Demo accounts</p>
           <p className="mt-1 text-muted-foreground">
             Student <code className="text-foreground">ana@uci.edu</code> · Organization{' '}
             <code className="text-foreground">info@habitatoc.org</code> · password{' '}

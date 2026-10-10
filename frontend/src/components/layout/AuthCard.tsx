@@ -19,9 +19,9 @@ export function AuthCard({
 }) {
   return (
     <div className={cn('mx-auto w-full max-w-md px-4 py-12 sm:py-16', className)}>
-      <div className="rounded-xl border bg-card p-6 shadow-xs sm:p-8">
-        {eyebrow && <p className="mb-2 text-sm font-medium text-primary">{eyebrow}</p>}
-        <h1 className="text-2xl font-semibold tracking-tight text-balance">{title}</h1>
+      <div className="rounded-2xl border bg-card p-6 sm:p-8">
+        {eyebrow && <p className="eyebrow mb-3 text-primary">{eyebrow}</p>}
+        <h1 className="font-display text-[26px] leading-[1.05] font-extrabold text-balance">{title}</h1>
         {description && <p className="mt-1.5 text-muted-foreground text-pretty">{description}</p>}
         <div className="mt-6">{children}</div>
       </div>
@@ -33,7 +33,7 @@ export function AuthCard({
 export function FormError({ message }: { message?: string }) {
   if (!message) return null
   return (
-    <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+    <p role="alert" className="rounded-lg border-2 border-destructive bg-destructive/5 px-3 py-2 text-sm font-semibold text-destructive">
       {message}
     </p>
   )

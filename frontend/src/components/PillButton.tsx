@@ -6,11 +6,26 @@ import { buttonVariants } from '@/components/ui/button'
 
 type PillButtonProps = React.ComponentProps<'button'> & {
   asChild?: boolean
-  tone?: 'solid' | 'outline'
+  tone?: 'solid' | 'outline' | 'light' | 'light-outline'
   size?: 'default' | 'sm'
 }
 
-// CIF-style call to action: rounded pill with a circular arrow chip on the right.
+const PILL_VARIANT = {
+  solid: 'pill',
+  outline: 'pill-outline',
+  light: 'pill-light',
+  'light-outline': 'pill-light-outline',
+} as const
+
+const CHIP_TONE = {
+  solid: 'bg-card text-foreground',
+  outline: 'bg-primary text-primary-foreground',
+  light: 'bg-indigo text-white',
+  'light-outline': 'bg-white text-indigo',
+}
+
+// Signature call to action: a pill with a circular arrow chip on the right.
+// The light tones are for dark or photographic backgrounds.
 export function PillButton({
   asChild = false,
   tone = 'solid',
@@ -24,7 +39,7 @@ export function PillButton({
     <Comp
       className={cn(
         buttonVariants({
-          variant: tone === 'solid' ? 'pill' : 'pill-outline',
+          variant: PILL_VARIANT[tone],
           size: size === 'sm' ? 'pill-sm' : 'pill',
         }),
         'group',
@@ -36,9 +51,9 @@ export function PillButton({
       <span
         aria-hidden
         className={cn(
-          'flex items-center justify-center rounded-full transition-transform group-hover:translate-x-0.5',
-          size === 'sm' ? 'size-7' : 'size-8',
-          tone === 'solid' ? 'bg-card text-primary' : 'bg-primary text-primary-foreground',
+          'flex items-center justify-center rounded-full transition-transform group-hover:translate-x-[3px] motion-reduce:transition-none',
+          size === 'sm' ? 'size-7' : 'size-9',
+          CHIP_TONE[tone],
         )}
       >
         <ArrowRight className="size-4" />

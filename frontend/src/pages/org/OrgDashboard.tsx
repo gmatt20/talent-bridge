@@ -40,7 +40,7 @@ export default function OrgDashboard() {
       {projects.loading && !projects.data ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading your projects">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-44 rounded-xl" />
+            <Skeleton key={i} className="h-44 rounded-2xl" />
           ))}
         </div>
       ) : unsupported ? (

@@ -12,6 +12,10 @@ from app.core import config
 
 _PBKDF2_ITERATIONS = 200_000
 
+# Stored for accounts created through Google sign-in. It is not a valid
+# `hash_password` result, so `verify_password` rejects every password for it.
+UNUSABLE_PASSWORD = "!"
+
 
 def hash_password(password: str) -> str:
     """Returns a salted PBKDF2 hash of `password`, as `"{salt}${digest}"`."""

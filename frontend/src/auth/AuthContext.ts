@@ -1,5 +1,12 @@
 import {createContext, useContext} from 'react';
-import type {LoginRequest, RegisterRequest, Role, User} from '../types/api';
+import type {
+  GoogleAuthResponse,
+  GoogleSignInRequest,
+  LoginRequest,
+  RegisterRequest,
+  Role,
+  User,
+} from '../types/api';
 
 /** The signed-in user and the actions that change the session. */
 export interface AuthState {
@@ -7,6 +14,7 @@ export interface AuthState {
   loading: boolean;
   login: (body: LoginRequest) => Promise<User>;
   register: (body: RegisterRequest) => Promise<User>;
+  googleSignIn: (body: GoogleSignInRequest) => Promise<GoogleAuthResponse>;
   logout: () => void;
 }
 

@@ -21,6 +21,8 @@ class Settings:  # pylint: disable=too-many-instance-attributes
             "data-api" mode.
         rds_database: Database name, for "data-api" mode.
         aws_region: AWS region for the RDS Data API client.
+        google_client_id: OAuth client ID that Google sign-in tokens must be
+            issued for. Empty disables Google sign-in.
     """
 
     database_url: str = os.environ.get(
@@ -37,6 +39,7 @@ class Settings:  # pylint: disable=too-many-instance-attributes
     rds_secret_arn: str = os.environ.get("RDS_SECRET_ARN", "")
     rds_database: str = os.environ.get("RDS_DATABASE", "")
     aws_region: str = os.environ.get("AWS_REGION", "us-west-2")
+    google_client_id: str = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 
 settings = Settings()

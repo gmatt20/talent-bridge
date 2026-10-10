@@ -4,6 +4,7 @@ import {Loader2} from 'lucide-react';
 import {homePath, useAuth} from '../auth/AuthContext';
 import {AuthCard} from '../components/layout/AuthCard';
 import {FormError} from '../components/FormError';
+import {GoogleSignIn} from '../components/GoogleSignIn';
 import {Button} from '../components/ui/button';
 import {Input} from '../components/ui/input';
 import {Label} from '../components/ui/label';
@@ -11,9 +12,12 @@ import {errorMessage} from '../lib/errors';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
-/** Email and password sign-in, returning to the page that required it. */
+/**
+ * Sign-in with an email and password or with Google, returning to the page
+ * that required it.
+ */
 export function Login() {
-  const {user, login} = useAuth();
+  const {user, login, googleSignIn} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   // RequireRole sets `from` when it redirects here; any other state is ignored.
@@ -33,6 +37,18 @@ export function Login() {
     setPending(true);
     try {
       const u = await login({email: email.trim(), password_hash: password});
+      navigate(from ?? homePath(u.role), {replace: true});
+    } catch (err) {
+      setError(errorMessage(err));
+      setPending(false);
+    }
+  };
+
+  const handleGoogleCredential = async (credential: string) => {
+    setError(undefined);
+    setPending(true);
+    try {
+      const {user: u} = await googleSignIn({credential});
       navigate(from ?? homePath(u.role), {replace: true});
     } catch (err) {
       setError(errorMessage(err));
@@ -91,6 +107,8 @@ export function Login() {
           Log in
         </Button>
       </form>
+
+      <GoogleSignIn text="signin_with" onCredential={handleGoogleCredential} />
 
       {USE_MOCKS && (
         <div className="mt-6 rounded-xl bg-accent p-3 text-sm">

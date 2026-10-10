@@ -32,6 +32,22 @@ export interface LoginRequest {
   password_hash: string;
 }
 
+/**
+ * Body of `POST /api/auth/google`. `role` and `name` only matter when the
+ * Google account has no Talent Bridge account yet.
+ */
+export interface GoogleSignInRequest {
+  /** The ID token from Google's sign-in button. */
+  credential: string;
+  role?: Role;
+  name?: string;
+}
+
+/** Returned by Google sign-in: a session, and whether it is a new account. */
+export interface GoogleAuthResponse extends AuthResponse {
+  isNewUser: boolean;
+}
+
 /** A skill from the shared catalog, used to tag students and projects. */
 export interface Skill {
   id: number;

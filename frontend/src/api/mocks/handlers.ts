@@ -1,5 +1,6 @@
 import type {
   AuthResponse,
+  GoogleAuthResponse,
   Organization,
   Project,
   ProjectBrief,
@@ -135,6 +136,23 @@ function requireString(
 
 function optString(v: unknown) {
   return typeof v === 'string' && v.trim() ? v.trim() : undefined;
+}
+
+/** Reads a JWT's claims without checking its signature. */
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  try {
+    const base64 = (token.split('.')[1] ?? '')
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    // A JWT payload is a JSON object; its fields are checked before use.
+    return JSON.parse(new TextDecoder().decode(bytes)) as Record<
+      string,
+      unknown
+    >;
+  } catch {
+    throw new ApiError(401, 'Google sign-in failed. Please try again.');
+  }
 }
 
 function toUser(mockUser: MockUser): User {
@@ -369,6 +387,55 @@ route('POST', '/api/auth/login', ({body}): AuthResponse => {
   );
   if (!user) throw new ApiError(401, 'Invalid email or password.');
   return {token: `mock.${user.id}`, user: toUser(user)};
+});
+
+route('POST', '/api/auth/google', ({body}): GoogleAuthResponse => {
+  // Mock mode trusts the token's claims; only the real backend verifies them.
+  const claims = decodeJwtPayload(requireString(body, 'credential'));
+  const email = optString(claims.email)?.toLowerCase();
+  if (!email) {
+    throw new ApiError(401, 'Google sign-in failed. Please try again.');
+  }
+
+  const existing = db.users.find(u => u.email === email);
+  if (existing) {
+    return {
+      token: `mock.${existing.id}`,
+      user: toUser(existing),
+      isNewUser: false,
+    };
+  }
+
+  if (body.role === undefined) {
+    throw new ApiError(
+      404,
+      'No account uses this Google email yet. Create an account to continue.',
+    );
+  }
+  // Checked against the allowed roles on the next line.
+  const role = body.role as Role;
+  if (!['organization', 'student', 'mentor'].includes(role)) {
+    throw new ApiError(400, 'Choose a role.');
+  }
+  const name = optString(body.name) ?? optString(claims.name);
+  if (!name) throw new ApiError(400, 'Name is required.');
+
+  const user: MockUser = {
+    id: db.nextId++,
+    role,
+    email,
+    // Random, so the account can't be opened with a password.
+    password: crypto.randomUUID(),
+    name,
+    createdAt: new Date().toISOString(),
+  };
+  db.users.push(user);
+  if (role === 'organization') {
+    db.organizations.push({userId: user.id, companyName: name});
+  }
+  if (role === 'student') db.students.push({userId: user.id, skillIds: []});
+  if (role === 'mentor') db.mentors.push({userId: user.id, skillIds: []});
+  return {token: `mock.${user.id}`, user: toUser(user), isNewUser: true};
 });
 
 route('GET', '/api/users/me', (ctx): User => toUser(requireUser(ctx)));

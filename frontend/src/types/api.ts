@@ -1,4 +1,4 @@
-// Mirrors the API contract in /README.md. Keep in sync with the backend.
+// Mirrors the API Reference in /ARCHITECTURE.md. Keep in sync with the backend.
 
 export type Role = 'organization' | 'student' | 'mentor'
 

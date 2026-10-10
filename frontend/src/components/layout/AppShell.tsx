@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 import { ChevronDown, LogOut, Menu, X } from 'lucide-react'
 import { homePath, useAuth } from '@/auth/AuthContext'
@@ -39,15 +40,15 @@ const ROLE_LABEL: Record<Role, string> = {
 const useMocks = import.meta.env.VITE_USE_MOCKS === 'true'
 
 export function AppShell() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
+  const signOut = useSignOut()
   const [menuOpen, setMenuOpen] = useState(false)
   const links = NAV[user?.role ?? 'guest']
 
   const handleLogout = () => {
-    logout()
     setMenuOpen(false)
-    navigate('/')
+    signOut()
   }
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -190,9 +191,19 @@ export function AppShell() {
   )
 }
 
-function ResetDemoData() {
+// Logging out on a guarded page makes RequireRole redirect to /login. Committing the
+// logout synchronously lets that redirect happen first, so the navigation to / wins.
+function useSignOut() {
   const { logout } = useAuth()
   const navigate = useNavigate()
+  return () => {
+    flushSync(logout)
+    navigate('/', { replace: true })
+  }
+}
+
+function ResetDemoData() {
+  const signOut = useSignOut()
   return (
     <button
       type="button"
@@ -200,8 +211,7 @@ function ResetDemoData() {
       onClick={async () => {
         const { resetMockDb } = await import('@/api/mocks/handlers')
         resetMockDb()
-        logout()
-        navigate('/')
+        signOut()
       }}
     >
       Demo mode · Reset demo data

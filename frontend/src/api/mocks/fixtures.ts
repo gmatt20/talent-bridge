@@ -1,6 +1,6 @@
 import type { Milestone, ProjectStatus, ProposalStatus, Role } from '@/types/api'
 
-// Seed data for VITE_USE_MOCKS. Mirrors README examples; extra orgs and students are fictional.
+// Seed data for VITE_USE_MOCKS. Mirrors ARCHITECTURE.md examples; extra orgs and students are fictional.
 
 export interface MockUser {
   id: number

@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { flushSync } from 'react-dom'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router'
-import { ChevronDown, LogOut, Menu, X } from 'lucide-react'
-import { homePath, useAuth } from '@/auth/AuthContext'
-import { PillButton } from '@/components/PillButton'
-import { Button } from '@/components/ui/button'
+import {useState} from 'react';
+import {flushSync} from 'react-dom';
+import {Link, NavLink, Outlet, useNavigate} from 'react-router';
+import {ChevronDown, LogOut, Menu, X} from 'lucide-react';
+import {homePath, useAuth} from '../../auth/AuthContext';
+import {PillButton} from '../PillButton';
+import {Button} from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,50 +12,56 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Toaster } from '@/components/ui/sonner'
-import { cn } from '@/lib/utils'
-import type { Role } from '@/types/api'
-import { Logo } from './Logo'
+} from '../ui/dropdown-menu';
+import {Toaster} from '../ui/sonner';
+import {cn} from '../../lib/utils';
+import type {Role} from '../../types/api';
+import {Logo} from './Logo';
 
-const NAV: Record<Role | 'guest', { to: string; label: string }[]> = {
-  guest: [{ to: '/projects', label: 'Browse projects' }],
+interface NavItem {
+  to: string;
+  label: string;
+}
+
+const NAV: Record<Role | 'guest', NavItem[]> = {
+  guest: [{to: '/projects', label: 'Browse projects'}],
   organization: [
-    { to: '/org', label: 'My projects' },
-    { to: '/org/projects/new', label: 'Submit a challenge' },
+    {to: '/org', label: 'My projects'},
+    {to: '/org/projects/new', label: 'Submit a challenge'},
   ],
   student: [
-    { to: '/student', label: 'Recommended' },
-    { to: '/projects', label: 'Browse projects' },
+    {to: '/student', label: 'Recommended'},
+    {to: '/projects', label: 'Browse projects'},
   ],
-  mentor: [{ to: '/projects', label: 'Browse projects' }],
-}
+  mentor: [{to: '/projects', label: 'Browse projects'}],
+};
 
 const ROLE_LABEL: Record<Role, string> = {
   organization: 'Organization',
   student: 'Student',
   mentor: 'Mentor',
-}
+};
 
-const useMocks = import.meta.env.VITE_USE_MOCKS === 'true'
+const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
+/** The page frame: header with role-aware navigation, the routed page, footer. */
 export function AppShell() {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const signOut = useSignOut()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const links = NAV[user?.role ?? 'guest']
+  const {user} = useAuth();
+  const navigate = useNavigate();
+  const signOut = useSignOut();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const links = NAV[user?.role ?? 'guest'];
 
   const handleLogout = () => {
-    setMenuOpen(false)
-    signOut()
-  }
+    setMenuOpen(false);
+    signOut();
+  };
 
-  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  const navLinkClass = ({isActive}: {isActive: boolean}) =>
     cn(
       'rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:text-primary',
       isActive ? 'bg-accent text-primary' : 'text-muted-foreground',
-    )
+    );
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -70,8 +76,11 @@ export function AppShell() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-6">
             <Logo />
-            <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-              {links.map((l) => (
+            <nav
+              aria-label="Main"
+              className="hidden items-center gap-1 md:flex"
+            >
+              {links.map(l => (
                 <NavLink key={l.to} to={l.to} end className={navLinkClass}>
                   {l.label}
                 </NavLink>
@@ -83,7 +92,10 @@ export function AppShell() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 gap-2 rounded-full pr-2 pl-1">
+                  <Button
+                    variant="ghost"
+                    className="h-9 gap-2 rounded-full pr-2 pl-1"
+                  >
                     <span
                       aria-hidden
                       className="flex size-7 items-center justify-center rounded-full bg-accent text-xs font-semibold text-primary"
@@ -97,10 +109,16 @@ export function AppShell() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>
                     <div className="truncate">{user.name}</div>
-                    <div className="text-xs font-normal text-muted-foreground">{ROLE_LABEL[user.role]}</div>
+                    <div className="text-xs font-normal text-muted-foreground">
+                      {ROLE_LABEL[user.role]}
+                    </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => navigate(homePath(user.role))}>Dashboard</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => navigate(homePath(user.role))}
+                  >
+                    Dashboard
+                  </DropdownMenuItem>
                   <DropdownMenuItem onSelect={handleLogout}>
                     <LogOut /> Log out
                   </DropdownMenuItem>
@@ -125,23 +143,30 @@ export function AppShell() {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={() => setMenuOpen(o => !o)}
           >
             {menuOpen ? <X /> : <Menu />}
           </Button>
         </div>
 
         {menuOpen && (
-          <nav id="mobile-menu" aria-label="Mobile" className="border-t bg-background px-4 pt-2 pb-4 md:hidden">
+          <nav
+            id="mobile-menu"
+            aria-label="Mobile"
+            className="border-t bg-background px-4 pt-2 pb-4 md:hidden"
+          >
             <ul className="flex flex-col gap-1">
-              {links.map((l) => (
+              {links.map(l => (
                 <li key={l.to}>
                   <NavLink
                     to={l.to}
                     end
                     onClick={() => setMenuOpen(false)}
-                    className={({ isActive }) =>
-                      cn('block rounded-lg px-3 py-2.5 font-medium', isActive ? 'bg-accent text-primary' : 'hover:bg-muted')
+                    className={({isActive}) =>
+                      cn(
+                        'block rounded-lg px-3 py-2.5 font-medium',
+                        isActive ? 'bg-accent text-primary' : 'hover:bg-muted',
+                      )
                     }
                   >
                     {l.label}
@@ -154,19 +179,33 @@ export function AppShell() {
                 <div className="flex items-center justify-between gap-3 px-3">
                   <div className="min-w-0">
                     <div className="truncate font-medium">{user.name}</div>
-                    <div className="text-sm text-muted-foreground">{ROLE_LABEL[user.role]}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {ROLE_LABEL[user.role]}
+                    </div>
                   </div>
-                  <Button variant="outline" className="rounded-full" onClick={handleLogout}>
+                  <Button
+                    variant="outline"
+                    className="rounded-full"
+                    onClick={handleLogout}
+                  >
                     <LogOut /> Log out
                   </Button>
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <Button variant="outline" asChild className="h-10 flex-1 rounded-full">
-                    <Link to="/login" onClick={() => setMenuOpen(false)}>Log in</Link>
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="h-10 flex-1 rounded-full"
+                  >
+                    <Link to="/login" onClick={() => setMenuOpen(false)}>
+                      Log in
+                    </Link>
                   </Button>
                   <Button asChild className="h-10 flex-1 rounded-full">
-                    <Link to="/register" onClick={() => setMenuOpen(false)}>Get started</Link>
+                    <Link to="/register" onClick={() => setMenuOpen(false)}>
+                      Get started
+                    </Link>
                   </Button>
                 </div>
               )}
@@ -181,49 +220,52 @@ export function AppShell() {
 
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>Built for OCC Hacks · Inspired by the Community Innovations Foundation</p>
-          {useMocks && <ResetDemoData />}
+          <p>
+            Built for OCC Hacks · Inspired by the Community Innovations
+            Foundation
+          </p>
+          {USE_MOCKS && <ResetDemoData />}
         </div>
       </footer>
 
       <Toaster position="top-center" richColors />
     </div>
-  )
+  );
 }
 
 // Logging out on a guarded page makes RequireRole redirect to /login. Committing the
 // logout synchronously lets that redirect happen first, so the navigation to / wins.
 function useSignOut() {
-  const { logout } = useAuth()
-  const navigate = useNavigate()
+  const {logout} = useAuth();
+  const navigate = useNavigate();
   return () => {
-    flushSync(logout)
-    navigate('/', { replace: true })
-  }
+    flushSync(logout);
+    navigate('/', {replace: true});
+  };
 }
 
 function ResetDemoData() {
-  const signOut = useSignOut()
+  const signOut = useSignOut();
   return (
     <button
       type="button"
       className="self-start rounded underline-offset-4 hover:text-foreground hover:underline"
       onClick={async () => {
-        const { resetMockDb } = await import('@/api/mocks/handlers')
-        resetMockDb()
-        signOut()
+        const {resetMockDb} = await import('../../api/mocks/handlers');
+        resetMockDb();
+        signOut();
       }}
     >
       Demo mode · Reset demo data
     </button>
-  )
+  );
 }
 
 function initials(name: string) {
   return name
     .split(/\s+/)
-    .filter(Boolean)
+    .filter(word => word !== '')
     .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
-    .join('')
+    .map(w => w[0]!.toUpperCase())
+    .join('');
 }

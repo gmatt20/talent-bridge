@@ -1,66 +1,86 @@
-import { ApiError } from './errors'
+import {ApiError} from './errors';
 
-export { ApiError }
+export {ApiError};
 
-const TOKEN_KEY = 'tb.token'
-const useMocks = import.meta.env.VITE_USE_MOCKS === 'true'
+const TOKEN_KEY = 'tb.token';
+const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
+/** Returns the stored session token, or null when signed out. */
 export function getToken(): string | null {
   try {
-    return localStorage.getItem(TOKEN_KEY)
+    return localStorage.getItem(TOKEN_KEY);
   } catch {
-    return null
+    return null;
   }
 }
 
+/** Stores the session token; null signs out. */
 export function setToken(token: string | null) {
   try {
-    if (token) localStorage.setItem(TOKEN_KEY, token)
-    else localStorage.removeItem(TOKEN_KEY)
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+    }
   } catch {
-    // storage unavailable (private mode); session just won't persist
+    // Storage unavailable (private mode); the session just won't persist.
   }
 }
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-export async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
-  const token = getToken()
+/**
+ * Sends a request to the API (or to the in-browser mocks when
+ * `VITE_USE_MOCKS=true`) with the session token, and returns the parsed JSON.
+ * Throws an `ApiError` for any non-2xx response.
+ */
+export async function request<T>(
+  method: Method,
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  const token = getToken();
 
-  if (useMocks) {
-    const { mockRequest } = await import('./mocks/handlers')
-    return mockRequest<T>(method, path, body, token)
+  if (USE_MOCKS) {
+    const {mockRequest} = await import('./mocks/handlers');
+    return mockRequest<T>(method, path, body, token);
   }
+
+  const headers: Record<string, string> = {};
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(path, {
     method,
-    headers: {
-      ...(body !== undefined && { 'Content-Type': 'application/json' }),
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
+    headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  });
 
-  const text = await res.text()
-  const data = text ? safeParse(text) : undefined
+  const text = await res.text();
+  const data = text ? safeParse(text) : undefined;
 
-  if (!res.ok) throw new ApiError(res.status, errorMessage(data) ?? res.statusText)
-  return data as T
+  if (!res.ok) {
+    throw new ApiError(res.status, messageFrom(data) ?? res.statusText);
+  }
+  // The response shape is defined by the API contract for this endpoint.
+  return data as T;
 }
 
 function safeParse(text: string): unknown {
   try {
-    return JSON.parse(text)
+    return JSON.parse(text);
   } catch {
-    return text
+    return text;
   }
 }
 
-function errorMessage(data: unknown): string | undefined {
-  if (typeof data === 'string') return data
+function messageFrom(data: unknown): string | undefined {
+  if (typeof data === 'string') return data;
   if (data && typeof data === 'object') {
-    const d = data as { error?: { message?: string } | string; message?: string }
-    if (typeof d.error === 'string') return d.error
-    return d.error?.message ?? d.message
+    // Error bodies are `{error: {message}}`, `{error: string}` or `{message}`;
+    // every field is checked before use.
+    const d = data as {error?: {message?: string} | string; message?: string};
+    if (typeof d.error === 'string') return d.error;
+    return d.error?.message ?? d.message;
   }
 }

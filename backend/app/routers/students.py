@@ -42,6 +42,12 @@ def update_me(
     user: dict = Depends(require_role("student")),
     db: psycopg.Connection = Depends(get_db),
 ):
+    if body.skillIds:
+        rows = db.execute("SELECT id FROM skills WHERE id = ANY(%s)", (body.skillIds,)).fetchall()
+        existing = {r["id"] for r in rows}
+        missing = [skill_id for skill_id in body.skillIds if skill_id not in existing]
+        if missing:
+            raise HTTPException(404, f"Skill {missing[0]} not found.")
     db.execute(
         "UPDATE student_profiles SET headline = %s, bio = %s, availability = %s WHERE user_id = %s",
         (body.headline, body.bio, body.availability, user["id"]),

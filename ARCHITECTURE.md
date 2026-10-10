@@ -102,6 +102,16 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "token": "eyJhbGciOi...", "user": { "id": 1, "role": "organization", "email": "info@habitatoc.org", "name": "Habitat for Humanity OC" } }
 ```
 
+**Errors**
+
+```json
+// 401 — no such user, or password doesn't match
+{ "error": "Invalid email or password." }
+
+// 422 — malformed body
+{ "error": "email: Field required" }
+```
+
 **`GET /api/users/me`** — Current user.
 
 ```json
@@ -119,6 +129,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 
 // response 200
 { "id": 2, "name": "Ana Reyes", "headline": "CS student at UCI", "bio": "Passionate about web dev and community impact.", "availability": "10 hrs/week", "skills": [{ "id": 1, "name": "React" }, { "id": 4, "name": "Python" }, { "id": 7, "name": "UI Design" }] }
+```
+
+**Errors**
+
+```json
+// 404 — a skillId doesn't exist in the skills catalog
+{ "error": "Skill 999 not found." }
 ```
 
 **`GET /api/students/{id}`** — Public student profile.

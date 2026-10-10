@@ -1,5 +1,6 @@
 """Organization profiles and an organization's own projects."""
 
+import re
 from typing import Any
 
 import fastapi
@@ -9,6 +10,8 @@ from app import schemas
 from app.routers import projects
 
 router = fastapi.APIRouter()
+
+URL_RE = re.compile(r"^https?://[^\s]+$")
 
 
 def _organization_out(db: deps.Connection, org_id: int) -> dict[str, Any]:
@@ -50,10 +53,15 @@ def update_me(
     db: deps.Db,
 ) -> dict[str, Any]:
     """Updates the signed-in organization's profile."""
+    website = body.website.strip() if body.website else None
+    if website and not URL_RE.match(website):
+        raise fastapi.HTTPException(
+            status_code=400, detail="Please enter a valid website URL."
+        )
     db.execute(
         "UPDATE organizations SET company_name = %s, description = %s, "
         "website = %s WHERE user_id = %s",
-        (body.company_name, body.description, body.website, user["id"]),
+        (body.company_name, body.description, website, user["id"]),
     )
     return _organization_out(db, user["id"])
 

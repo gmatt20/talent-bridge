@@ -464,7 +464,11 @@ route('PUT', '/api/organizations/me', (ctx): Organization => {
   const o = db.organizations.find(o => o.userId === user.id)!;
   o.companyName = requireString(ctx.body, 'companyName', 'Organization name');
   o.description = optString(ctx.body.description);
-  o.website = optString(ctx.body.website);
+  const website = optString(ctx.body.website);
+  if (website && !/^https?:\/\/[^\s]+$/.test(website)) {
+    throw new ApiError(400, 'Please enter a valid website URL.');
+  }
+  o.website = website;
   return {
     id: user.id,
     companyName: o.companyName,
@@ -509,12 +513,16 @@ route(
 
 route('POST', '/api/projects', (ctx): Project => {
   const user = requireUser(ctx, 'organization');
+  const deadline = optString(ctx.body.deadline);
+  if (deadline && !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+    throw new ApiError(400, 'Please use a valid date in YYYY-MM-DD format.');
+  }
   const p = {
     id: db.nextId++,
     organizationId: user.id,
     title: requireString(ctx.body, 'title', 'Title'),
     description: requireString(ctx.body, 'description', 'Description'),
-    deadline: optString(ctx.body.deadline),
+    deadline,
     category: optString(ctx.body.category),
     status: 'open' as const,
     createdAt: new Date().toISOString(),

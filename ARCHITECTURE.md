@@ -145,11 +145,25 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "id": 2, "name": "Ana Reyes", "headline": "CS student at UCI", "bio": "Passionate about web dev and community impact.", "availability": "10 hrs/week", "rating": 4.8, "skills": [{ "id": 1, "name": "React" }, { "id": 4, "name": "Python" }] }
 ```
 
+**Errors**
+
+```json
+// 404 — no student with this id
+{ "error": "Student not found." }
+```
+
 **`GET /api/organizations/{id}`** — Public organization profile.
 
 ```json
 // response 200
 { "id": 1, "companyName": "Habitat for Humanity OC", "description": "We build affordable housing across Orange County.", "website": "https://habitatoc.org", "totalProjectsPosted": 3 }
+```
+
+**Errors**
+
+```json
+// 404 — no organization with this id
+{ "error": "Organization not found." }
 ```
 
 **`PUT /api/organizations/me`** — Update own organization profile (organization only).
@@ -160,6 +174,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 
 // response 200
 { "id": 1, "companyName": "Habitat for Humanity OC", "description": "We build affordable housing across Orange County.", "website": "https://habitatoc.org", "totalProjectsPosted": 3 }
+```
+
+**Errors**
+
+```json
+// 400 — website doesn't look like a URL
+{ "error": "Please enter a valid website URL." }
 ```
 
 **`GET /api/organizations/me/projects`** — Own projects, any status (organization only).
@@ -191,6 +212,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "id": 10, "title": "Volunteer Scheduling App", "description": "We need a simple app so volunteers can see open build days and sign up...", "deadline": "2026-12-01", "category": "Web App", "status": "open", "organization": { "id": 1, "companyName": "Habitat for Humanity OC" } }
 ```
 
+**Errors**
+
+```json
+// 400 — deadline isn't a YYYY-MM-DD date
+{ "error": "Please use a valid date in YYYY-MM-DD format." }
+```
+
 **`GET /api/projects`** — List open projects.
 
 ```json
@@ -205,6 +233,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "id": 10, "title": "Volunteer Scheduling App", "description": "We need a simple app so volunteers can see open build days and sign up...", "deadline": "2026-12-01", "category": "Web App", "status": "open", "organization": { "id": 1, "companyName": "Habitat for Humanity OC" }, "brief": { "objectives": ["Let volunteers view and sign up for build days"], "deliverables": ["Sign-up form", "Admin view of volunteer roster"], "suggestedSkills": [{ "id": 1, "name": "React" }, { "id": 4, "name": "Python" }], "milestones": [{ "title": "Design sign-up flow", "dueDate": "2026-10-24" }], "scope": "3-month project, ~10 hrs/week" } }
 ```
 
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
+```
+
 ### AI
 
 **`POST /api/projects/{id}/analyze`** — Turn raw requirements into a structured brief (organization only).
@@ -212,6 +247,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 ```json
 // response 200
 { "objectives": ["Let volunteers view and sign up for build days", "Reduce phone coordination time"], "deliverables": ["Sign-up form", "Admin view of volunteer roster"], "suggestedSkills": [{ "id": 1, "name": "React" }, { "id": 4, "name": "Python" }], "milestones": [{ "title": "Design sign-up flow", "dueDate": "2026-10-24" }, { "title": "Build MVP", "dueDate": "2026-11-14" }], "scope": "3-month project, ~10 hrs/week" }
+```
+
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
 ```
 
 **`GET /api/students/me/recommendations`** — AI-matched projects for the current student.
@@ -235,6 +277,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "students": [{ "student": { "id": 2, "name": "Ana Reyes", "headline": "CS student at UCI" }, "matchScore": 0.86, "reasons": ["Has React and Python skills", "Available 10 hrs/week"] }], "mentors": [{ "mentor": { "id": 5, "name": "David Kim", "headline": "Senior Engineer, 10 yrs web" }, "matchScore": 0.74, "reasons": ["Experience with scheduling systems"] }] }
 ```
 
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
+```
+
 ### Apply & Team
 
 **`POST /api/projects/{id}/proposals`** — Student applies to a project.
@@ -247,6 +296,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "id": 21, "coverLetter": "I've built similar booking flows in class projects...", "status": "pending", "student": { "id": 2, "name": "Ana Reyes" }, "createdAt": "2026-10-10T12:00:00Z" }
 ```
 
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
+```
+
 **`GET /api/projects/{id}/proposals`** — Pending applications (organization only).
 
 ```json
@@ -254,11 +310,25 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 [{ "id": 21, "coverLetter": "I've built similar booking flows in class projects...", "status": "pending", "student": { "id": 2, "name": "Ana Reyes", "rating": 4.8, "skills": [{ "id": 1, "name": "React" }] }, "createdAt": "2026-10-10T12:00:00Z" }]
 ```
 
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
+```
+
 **`POST /api/proposals/{id}/accept`** — Organization accepts a student; team formation begins.
 
 ```json
 // response 200
 { "id": 21, "status": "accepted", "projectId": 10, "student": { "id": 2, "name": "Ana Reyes" } }
+```
+
+**Errors**
+
+```json
+// 404 — no application with this id
+{ "error": "Application not found." }
 ```
 
 **`POST /api/projects/{id}/mentors`** — Mentor joins a project team (mentor only).
@@ -276,4 +346,11 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 ```json
 // response 200
 { "project": { "id": 10, "title": "Volunteer Scheduling App", "status": "in_progress" }, "organization": { "id": 1, "companyName": "Habitat for Humanity OC" }, "student": { "id": 2, "name": "Ana Reyes" }, "mentor": { "id": 5, "name": "David Kim" } }
+```
+
+**Errors**
+
+```json
+// 404 — no project with this id
+{ "error": "Project not found." }
 ```

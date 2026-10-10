@@ -1,5 +1,6 @@
 """Projects, their AI briefs and recommendations, applications and teams."""
 
+from datetime import datetime
 from typing import Any
 
 import fastapi
@@ -123,11 +124,20 @@ def create_project(
         raise fastapi.HTTPException(
             status_code=400, detail="Description is required."
         )
+    deadline = body.deadline.strip() if body.deadline else None
+    if deadline:
+        try:
+            datetime.strptime(deadline, "%Y-%m-%d")
+        except ValueError:
+            raise fastapi.HTTPException(
+                status_code=400,
+                detail="Please use a valid date in YYYY-MM-DD format.",
+            )
     row = db.execute(
         "INSERT INTO projects "
         "(organization_id, title, description, deadline, category) "
         "VALUES (%s, %s, %s, %s, %s) RETURNING *",
-        (user["id"], title, description, body.deadline, body.category),
+        (user["id"], title, description, deadline, body.category),
     ).fetchone()
     return project_detail_out(db, row)
 

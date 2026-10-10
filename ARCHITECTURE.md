@@ -51,9 +51,26 @@ npm run dev
 Set `VITE_USE_MOCKS=false` in `frontend/.env` to point the frontend at the
 real backend (default is `true`, using the in-browser mock API).
 
+### Google sign-in (optional)
+
+The login and register pages show a "Sign in with Google" button when an
+OAuth client ID is configured, next to email and password.
+
+1. In the Google Cloud Console, open **APIs & Services → Credentials** and
+   create an **OAuth client ID** of type **Web application**.
+2. Add the app's URL (`http://localhost:5173` for local development) under
+   **Authorized JavaScript origins**. No redirect URI or client secret is
+   needed.
+3. Put the client ID in both `.env` files, then restart both servers:
+   `GOOGLE_CLIENT_ID=...` in `backend/.env` and `VITE_GOOGLE_CLIENT_ID=...` in
+   `frontend/.env`.
+
+The client ID is public. Leaving it empty hides the button and turns the
+endpoint off.
+
 ## API Reference
 
-All endpoints require `Authorization: Bearer <token>` except `register` and `login`.
+All endpoints require `Authorization: Bearer <token>` except `register`, `login` and `google`.
 
 ### Auth & Users
 
@@ -110,6 +127,44 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 
 // 422 — malformed body
 { "error": "email: Field required" }
+```
+
+**`POST /api/auth/google`** — Sign in with Google, creating the account on first use.
+
+`credential` is the ID token from Google's sign-in button. The backend
+verifies it and matches the account by its Google email, so someone who
+registered with that email and a password signs in to the same account.
+`role` and `name` are only used when the email has no account yet; `name`
+defaults to the Google profile name. Accounts created this way have no
+password.
+
+```json
+// request
+{ "credential": "eyJhbGciOi...", "role": "student", "name": "Ana Reyes" }
+// role and name are optional
+
+// response 200
+{ "token": "eyJhbGciOi...", "user": { "id": 2, "role": "student", "email": "ana@uci.edu", "name": "Ana Reyes" }, "isNewUser": true }
+```
+
+**Errors**
+
+```json
+// 400 — new account with an invalid role, or no name
+{ "error": "Choose a role." }
+{ "error": "Name is required." }
+
+// 401 — the token is forged, expired or for another app, or the email is unverified
+{ "error": "Google sign-in failed. Please try again." }
+
+// 404 — no account for this email, and no role was sent to create one
+{ "error": "No account uses this Google email yet. Create an account to continue." }
+
+// 409 — new account whose name is taken
+{ "error": "An account with this name already exists." }
+
+// 503 — GOOGLE_CLIENT_ID is not set on the server
+{ "error": "Google sign-in is not set up yet." }
 ```
 
 **`GET /api/users/me`** — Current user.

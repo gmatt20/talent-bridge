@@ -1,6 +1,13 @@
 import {useState, type ReactNode} from 'react';
 import {Link, useLocation, useParams} from 'react-router';
-import {ArrowLeft, CalendarDays, Compass, Sparkles, Tag} from 'lucide-react';
+import {
+  ArrowLeft,
+  CalendarDays,
+  Compass,
+  PartyPopper,
+  Sparkles,
+  Tag,
+} from 'lucide-react';
 import * as api from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {EmptyState} from '../../components/EmptyState';
@@ -172,6 +179,18 @@ function ApplyPanel({project}: ApplyPanelProps) {
     );
   } else if (proposals.loading && !proposals.data) {
     body = <Skeleton className="h-12 rounded-full" />;
+  } else if (status === 'accepted') {
+    body = (
+      <div className="space-y-2 rounded-xl bg-success-surface p-4">
+        <p className="flex items-center gap-2 font-semibold text-success">
+          <PartyPopper className="size-5" aria-hidden />
+          You’re on the team
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {project.organization.companyName} picked you for this project.
+        </p>
+      </div>
+    );
   } else if (status) {
     body = (
       <div className="flex items-center justify-between gap-3">

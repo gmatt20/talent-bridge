@@ -67,6 +67,24 @@ class LoginRequest(CamelModel):
     password_hash: str = pydantic.Field(alias="password_hash")
 
 
+class GoogleSignInRequest(CamelModel):
+    """Body of `POST /api/auth/google`.
+
+    `role` and `name` are only used when the Google account has no Talent
+    Bridge account yet; `name` defaults to the Google profile name.
+    """
+
+    credential: str
+    role: str | None = None
+    name: str | None = None
+
+
+class GoogleAuthResponse(AuthResponse):
+    """Returned by Google sign-in: a session, and whether it is new."""
+
+    is_new_user: bool
+
+
 class StudentSummary(CamelModel):
     """The short form of a student, shown in lists."""
 

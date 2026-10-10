@@ -1,5 +1,7 @@
 import type {
   AuthResponse,
+  GoogleAuthResponse,
+  GoogleSignInRequest,
   LoginRequest,
   RegisterRequest,
   User,
@@ -14,6 +16,14 @@ export function register(body: RegisterRequest) {
 /** Exchanges an email and password for a session token and user. */
 export function login(body: LoginRequest) {
   return request<AuthResponse>('POST', '/api/auth/login', body);
+}
+
+/**
+ * Exchanges a Google ID token for a session, creating the account when the
+ * Google email is new and a role is given.
+ */
+export function googleSignIn(body: GoogleSignInRequest) {
+  return request<GoogleAuthResponse>('POST', '/api/auth/google', body);
 }
 
 /** Loads the user the current session token belongs to. */

@@ -10,6 +10,7 @@ import {
 import {homePath, useAuth} from '../auth/AuthContext';
 import {AuthCard} from '../components/layout/AuthCard';
 import {FormError} from '../components/FormError';
+import {GoogleSignIn} from '../components/GoogleSignIn';
 import {Button} from '../components/ui/button';
 import {Input} from '../components/ui/input';
 import {Label} from '../components/ui/label';
@@ -46,9 +47,12 @@ const ONBOARDING: Record<SignupRole, string> = {
   student: '/onboarding/student',
 };
 
-/** Sign-up: pick a role, then name, email and password. */
+/**
+ * Sign-up: pick a role, then either name, email and password or a Google
+ * account.
+ */
 export function Register() {
-  const {user, register} = useAuth();
+  const {user, register, googleSignIn} = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const initial = params.get('role');
@@ -83,6 +87,29 @@ export function Register() {
         password_hash: password,
       });
       navigate(ONBOARDING[role], {replace: true});
+    } catch (err) {
+      setError(errorMessage(err));
+      setPending(false);
+    }
+  };
+
+  const handleGoogleCredential = async (credential: string) => {
+    if (!role) {
+      return setError(
+        'Choose whether you’re an organization or a student, then continue with Google.',
+      );
+    }
+    setError(undefined);
+    setPending(true);
+    try {
+      const res = await googleSignIn({
+        credential,
+        role,
+        name: name.trim() || undefined,
+      });
+      // An existing account keeps its own role, whatever was picked here.
+      const next = res.isNewUser ? ONBOARDING[role] : homePath(res.user.role);
+      navigate(next, {replace: true});
     } catch (err) {
       setError(errorMessage(err));
       setPending(false);
@@ -227,6 +254,8 @@ export function Register() {
           Create account
         </Button>
       </form>
+
+      <GoogleSignIn text="signup_with" onCredential={handleGoogleCredential} />
     </AuthCard>
   );
 }

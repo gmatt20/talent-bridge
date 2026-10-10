@@ -13,6 +13,8 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "psycopg[binary]>=3.2",
+    "google-auth>=2.35",
+    "requests>=2.32",
 ]
 
 [dependency-groups]

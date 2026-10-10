@@ -14,8 +14,9 @@ from botocore.exceptions import BotoCoreError, ClientError
 
 log = logging.getLogger(__name__)
 
-# DeepSeek R1 inference profile in us-west-2. Swap via env var when evaluating alternatives.
-DEFAULT_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "us.deepseek.r1-v1:0")
+# Nova Lite is a regional model in us-west-2 — no cross-region inference profile,
+# so IAM policy stays scoped to one region. Swap via BEDROCK_MODEL_ID.
+DEFAULT_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
 DEFAULT_REGION = os.getenv("AWS_REGION", "us-west-2")
 DEFAULT_TEMPERATURE = float(os.getenv("BEDROCK_TEMPERATURE", "0.2"))
 MAX_RETRIES = 2

@@ -13,37 +13,22 @@ file covers project structure, local setup, and the API contract.
 
 ### Backend
 
-There's a shared Aurora PostgreSQL cluster (`talent-bridge`) already
-provisioned on AWS. Two ways to reach it, controlled by `DB_MODE` in
-`backend/.env`:
-
-**`DB_MODE=data-api` (recommended)** — no VPC/SSH access needed at all, just
-signed HTTPS calls authenticated with your own AWS credentials:
+Connects to the shared Aurora PostgreSQL cluster (`talent-bridge`) over the
+RDS Data API — signed HTTPS calls authenticated with your own AWS
+credentials, so no VPC access or database port is needed.
 
 ```sh
-aws login --profile <your-profile>   # or however your team's CLI auth works
+aws login --profile <your-profile>
 cd backend
-cp .env.example .env   # fill in RDS_CLUSTER_ARN, RDS_SECRET_ARN, RDS_DATABASE, AWS_REGION
+cp .env.example .env   # fill in the RDS_* values
 uv sync
-uv run python -m app.scripts.load_schema   # first time only, or after a schema change
-uv run python -m app.scripts.seed_skills   # first time only — loads the skills catalog
+uv run python -m app.scripts.load_schema   # first time, or after a schema change
+uv run python -m app.scripts.seed_skills   # first time — loads the skills catalog
 uv run uvicorn app.main:app --env-file .env --reload
 ```
 
-**`DB_MODE=psycopg`** — direct TCP, needs an SSH tunnel through the bastion
-(`tb-bastion`, security-group-restricted — ask whoever provisioned it for
-access or the `.pem` key) forwarding a local port to the Aurora endpoint:
-
-```sh
-ssh -i /path/to/tb-bastion-key.pem -N -L 5433:talent-bridge.cluster-ctsccqqmkzf0.us-west-2.rds.amazonaws.com:5432 ec2-user@<bastion-ip>
-# then, with DATABASE_URL in .env pointed at 127.0.0.1:5433
-uv run python -m app.scripts.load_schema
-uv run python -m app.scripts.seed_skills
-uv run uvicorn app.main:app --env-file .env --reload
-```
-
-**Fully local Postgres** (no AWS needed, e.g. for offline dev) — point
-`DATABASE_URL` at a local instance instead:
+To work offline instead, set `DB_MODE=psycopg` and point `DATABASE_URL` at a
+local Postgres:
 
 ```sh
 brew install postgresql@17
@@ -51,7 +36,6 @@ brew services start postgresql@17
 createdb talent_bridge
 cd backend
 psql -d talent_bridge -f db/schema.sql
-# DB_MODE=psycopg, DATABASE_URL=postgresql:///talent_bridge in .env
 uv run python -m app.scripts.seed_skills
 uv run uvicorn app.main:app --env-file .env --reload
 ```

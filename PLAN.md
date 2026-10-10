@@ -61,10 +61,10 @@ works end-to-end — do not block the MVP on it.
 
 ## Tech Stack
 
-- **Backend** — Python + FastAPI, no ORM. Postgres access via either plain
-  `psycopg` (direct TCP, needs the bastion SSH tunnel) or the RDS Data API
-  (signed HTTPS, needs only AWS credentials) — see ARCHITECTURE.md. AWS
-  Bedrock calls via `boto3`.
+- **Backend** — Python + FastAPI, no ORM. Aurora access via the RDS Data
+  API (signed HTTPS, needs only AWS credentials), with plain `psycopg` as
+  the offline/local fallback — see ARCHITECTURE.md. AWS Bedrock calls via
+  `boto3`.
 - **Frontend** — React + TypeScript (Vite), Tailwind CSS v4, shadcn/ui
 - **AWS** — Bedrock for AI matchmaking/requirement-structuring; a shared
   Aurora PostgreSQL cluster (`talent-bridge`, us-west-2) for persistence

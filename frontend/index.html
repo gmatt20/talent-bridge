@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#f6f5fb" />
     <script>
       // Apply the saved or system theme before the first paint so dark mode
-      // doesn't flash white. ThemeProvider takes over once React loads.
+      // doesn't flash white. ThemeProvider takes over once React loads. Keep
+      // 'tb.theme' in sync with THEME_STORAGE_KEY in src/theme/ThemeContext.ts.
       (function () {
         var theme = 'system';
         try {

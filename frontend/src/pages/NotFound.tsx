@@ -1,9 +1,10 @@
-import { Link } from 'react-router'
-import { Compass } from 'lucide-react'
-import { EmptyState } from '@/components/EmptyState'
-import { PillButton } from '@/components/PillButton'
+import {Link} from 'react-router';
+import {Compass} from 'lucide-react';
+import {EmptyState} from '../components/EmptyState';
+import {PillButton} from '../components/PillButton';
 
-export default function NotFound() {
+/** Shown for any URL that doesn't match a route. */
+export function NotFound() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
       <EmptyState
@@ -17,5 +18,5 @@ export default function NotFound() {
         }
       />
     </div>
-  )
+  );
 }

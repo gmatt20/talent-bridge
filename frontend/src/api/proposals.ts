@@ -1,11 +1,19 @@
-import type { AcceptProposalResponse, Proposal } from '@/types/api'
-import { request } from './client'
+import type {AcceptProposalResponse, Proposal} from '../types/api';
+import {request} from './client';
 
-export const create = (projectId: number, coverLetter: string) =>
-  request<Proposal>('POST', `/api/projects/${projectId}/proposals`, { coverLetter })
+/** Submits the signed-in student's application to a project. */
+export function create(projectId: number, coverLetter: string) {
+  return request<Proposal>('POST', `/api/projects/${projectId}/proposals`, {
+    coverLetter,
+  });
+}
 
-export const listForProject = (projectId: number) =>
-  request<Proposal[]>('GET', `/api/projects/${projectId}/proposals`)
+/** Lists the applications to a project, for its organization. */
+export function listForProject(projectId: number) {
+  return request<Proposal[]>('GET', `/api/projects/${projectId}/proposals`);
+}
 
-export const accept = (id: number) =>
-  request<AcceptProposalResponse>('POST', `/api/proposals/${id}/accept`)
+/** Accepts an application, which starts forming the project's team. */
+export function accept(id: number) {
+  return request<AcceptProposalResponse>('POST', `/api/proposals/${id}/accept`);
+}

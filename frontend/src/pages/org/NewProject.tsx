@@ -1,85 +1,109 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { ArrowLeft, Lightbulb, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import * as api from '@/api'
-import { AnalyzingState } from '@/components/project/BriefView'
-import { FormError } from '@/components/layout/AuthCard'
-import { PageHeader } from '@/components/PageHeader'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { todayIso } from '@/lib/format'
+import {useState, type FormEvent} from 'react';
+import {Link, useNavigate} from 'react-router';
+import {ArrowLeft, Lightbulb, Loader2} from 'lucide-react';
+import {toast} from 'sonner';
+import * as api from '../../api';
+import {AnalyzingState} from '../../components/project/AnalyzingState';
+import {FormError} from '../../components/FormError';
+import {PageHeader} from '../../components/PageHeader';
+import {Button} from '../../components/ui/button';
+import {Input} from '../../components/ui/input';
+import {Label} from '../../components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
+import {Textarea} from '../../components/ui/textarea';
+import {todayIso} from '../../lib/format';
+import {errorMessage} from '../../lib/errors';
 
-const CATEGORIES = ['Web App', 'Mobile App', 'Marketing', 'Data', 'Design', 'Other']
+const CATEGORIES = [
+  'Web App',
+  'Mobile App',
+  'Marketing',
+  'Data',
+  'Design',
+  'Other',
+];
 
 const PROMPTS = [
   'What’s the problem today, and who does it affect?',
   'How do you handle it right now?',
   'What would success look like in a few months?',
-]
+];
 
 // Short descriptions give the AI too little to work with.
-const MIN_DESCRIPTION = 60
+const MIN_DESCRIPTION = 60;
 
-export default function NewProject() {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [deadline, setDeadline] = useState('')
-  const [category, setCategory] = useState('')
-  const [error, setError] = useState<string>()
-  const [step, setStep] = useState<'form' | 'creating' | 'analyzing'>('form')
+/** The form an organization uses to submit a challenge, then see it analyzed. */
+export function NewProject() {
+  const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [category, setCategory] = useState('');
+  const [error, setError] = useState<string>();
+  const [step, setStep] = useState<'form' | 'creating' | 'analyzing'>('form');
 
-  const descriptionShort = description.trim().length < MIN_DESCRIPTION
+  const descriptionShort = description.trim().length < MIN_DESCRIPTION;
 
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) return setError('Give your challenge a short title.')
-    if (descriptionShort)
-      return setError(`Add a little more detail (at least ${MIN_DESCRIPTION} characters) so the AI can help.`)
-    setError(undefined)
-    setStep('creating')
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return setError('Give your challenge a short title.');
+    if (descriptionShort) {
+      return setError(
+        `Add a little more detail (at least ${MIN_DESCRIPTION} characters) so the AI can help.`,
+      );
+    }
+    setError(undefined);
+    setStep('creating');
 
-    let projectId: number
+    let projectId: number;
     try {
       const project = await api.projects.create({
         title: title.trim(),
         description: description.trim(),
         deadline: deadline || undefined,
         category: category || undefined,
-      })
-      projectId = project.id
+      });
+      projectId = project.id;
     } catch (err) {
-      setError((err as Error).message)
-      setStep('form')
-      return
+      setError(errorMessage(err));
+      setStep('form');
+      return;
     }
 
-    setStep('analyzing')
+    setStep('analyzing');
     try {
-      await api.projects.analyze(projectId)
+      await api.projects.analyze(projectId);
     } catch {
       // The challenge is saved; the brief can be generated again from the project page.
-      toast.error('Your challenge was saved, but we couldn’t generate the brief. You can try again.')
+      toast.error(
+        'Your challenge was saved, but we couldn’t generate the brief. You can try again.',
+      );
     }
-    navigate(`/org/projects/${projectId}`, { replace: true })
-  }
+    navigate(`/org/projects/${projectId}`, {replace: true});
+  };
 
   if (step === 'analyzing') {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <AnalyzingState />
       </div>
-    )
+    );
   }
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-10 sm:px-6">
       <div>
-        <Button variant="ghost" asChild className="-ml-3 rounded-full text-muted-foreground">
+        <Button
+          variant="ghost"
+          asChild
+          className="-ml-3 rounded-full text-muted-foreground"
+        >
           <Link to="/org">
             <ArrowLeft aria-hidden /> My projects
           </Link>
@@ -91,7 +115,11 @@ export default function NewProject() {
         />
       </div>
 
-      <form onSubmit={onSubmit} noValidate className="space-y-6 rounded-2xl border bg-card p-5 sm:p-8">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="space-y-6 rounded-2xl border bg-card p-5 sm:p-8"
+      >
         <FormError message={error} />
 
         <div className="space-y-2">
@@ -103,7 +131,7 @@ export default function NewProject() {
             placeholder="Volunteer scheduling app"
             className="h-10"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
           />
         </div>
 
@@ -111,10 +139,11 @@ export default function NewProject() {
           <Label htmlFor="description">What do you need help with?</Label>
           <div className="rounded-xl bg-accent p-3 text-sm">
             <p className="flex items-center gap-2 font-medium text-primary">
-              <Lightbulb className="size-4" aria-hidden /> Helpful things to mention
+              <Lightbulb className="size-4" aria-hidden /> Helpful things to
+              mention
             </p>
             <ul className="mt-1.5 list-disc space-y-0.5 pl-6 text-accent-foreground">
-              {PROMPTS.map((p) => (
+              {PROMPTS.map(p => (
                 <li key={p}>{p}</li>
               ))}
             </ul>
@@ -127,7 +156,7 @@ export default function NewProject() {
             placeholder="We coordinate volunteers by phone, which takes hours every week. We’d love a simple way for volunteers to see open build days and sign up themselves."
             className="min-h-40"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)}
           />
           <p id="description-count" className="text-sm text-muted-foreground">
             {descriptionShort
@@ -139,7 +168,10 @@ export default function NewProject() {
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="deadline">
-              Deadline <span className="font-normal text-muted-foreground">(optional)</span>
+              Deadline{' '}
+              <span className="font-normal text-muted-foreground">
+                (optional)
+              </span>
             </Label>
             <Input
               id="deadline"
@@ -147,19 +179,25 @@ export default function NewProject() {
               min={todayIso()}
               className="h-10"
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              onChange={e => setDeadline(e.target.value)}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">
-              Category <span className="font-normal text-muted-foreground">(optional)</span>
+              Category{' '}
+              <span className="font-normal text-muted-foreground">
+                (optional)
+              </span>
             </Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger id="category" className="w-full data-[size=default]:h-10">
+            <Select value={category} onValueChange={next => setCategory(next)}>
+              <SelectTrigger
+                id="category"
+                className="w-full data-[size=default]:h-10"
+              >
                 <SelectValue placeholder="Choose a category" />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((c) => (
+                {CATEGORIES.map(c => (
                   <SelectItem key={c} value={c}>
                     {c}
                   </SelectItem>
@@ -173,12 +211,18 @@ export default function NewProject() {
           <Button variant="ghost" asChild className="rounded-full">
             <Link to="/org">Cancel</Link>
           </Button>
-          <Button type="submit" className="h-10 rounded-full px-6" disabled={step === 'creating'}>
-            {step === 'creating' && <Loader2 className="animate-spin" aria-hidden />}
+          <Button
+            type="submit"
+            className="h-10 rounded-full px-6"
+            disabled={step === 'creating'}
+          >
+            {step === 'creating' && (
+              <Loader2 className="animate-spin" aria-hidden />
+            )}
             Submit challenge
           </Button>
         </div>
       </form>
     </div>
-  )
+  );
 }

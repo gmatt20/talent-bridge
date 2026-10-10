@@ -1,19 +1,26 @@
-import { X } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
-import type { Skill } from '@/types/api'
+import {X} from 'lucide-react';
+import {Badge} from '../ui/badge';
+import {cn} from '../../lib/utils';
+import type {Skill} from '../../types/api';
 
-export function SkillBadge({
-  skill,
-  onRemove,
-  className,
-}: {
-  skill: Skill
-  onRemove?: () => void
-  className?: string
-}) {
+/** Props for {@link SkillBadge}. */
+export interface SkillBadgeProps {
+  skill: Skill;
+  /** Shows a remove button that calls this. */
+  onRemove?: () => void;
+  className?: string;
+}
+
+/** A pill naming one skill, optionally removable. */
+export function SkillBadge({skill, onRemove, className}: SkillBadgeProps) {
   return (
-    <Badge className={cn('h-7 bg-accent px-3 text-sm text-primary', onRemove && 'pr-1', className)}>
+    <Badge
+      className={cn(
+        'h-7 bg-accent px-3 text-sm text-primary',
+        onRemove && 'pr-1',
+        className,
+      )}
+    >
       {skill.name}
       {onRemove && (
         <button
@@ -26,5 +33,5 @@ export function SkillBadge({
         </button>
       )}
     </Badge>
-  )
+  );
 }

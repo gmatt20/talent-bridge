@@ -4,7 +4,9 @@ import { AppShell } from '@/components/layout/AppShell'
 import Landing from '@/pages/Landing'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
-import OrgDashboard from '@/pages/OrgDashboard'
+import NewProject from '@/pages/org/NewProject'
+import OrgDashboard from '@/pages/org/OrgDashboard'
+import OrgProjectDetail from '@/pages/org/OrgProjectDetail'
 import OrgOnboarding from '@/pages/onboarding/OrgOnboarding'
 import Register from '@/pages/Register'
 import StudentDashboard from '@/pages/StudentDashboard'
@@ -46,6 +48,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole role="organization">
             <OrgDashboard />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'org/projects/new',
+        element: (
+          <RequireRole role="organization">
+            <NewProject />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'org/projects/:id',
+        element: (
+          <RequireRole role="organization">
+            <OrgProjectDetail />
           </RequireRole>
         ),
       },

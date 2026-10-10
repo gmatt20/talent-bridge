@@ -67,6 +67,30 @@ works end-to-end — do not block the MVP on it.
 - **AWS** — Bedrock for AI matchmaking/requirement-structuring; Postgres
   for persistence (**local Postgres for hackathon dev**)
 
+## API Contract
+
+The full REST contract lives in [ARCHITECTURE.md](./ARCHITECTURE.md)'s API
+Reference section — treat it as canonical and don't duplicate the JSON
+shapes here; this is just the index so the contract doesn't get lost in the
+file. Build order:
+
+1. **Auth & Users** — register/login (`role`: `organization` | `student` |
+   `mentor`), bearer token, `GET /api/users/me`.
+2. **Profiles & Skills** — student/organization profile read/update, skill
+   search for tagging.
+3. **Projects** — organizations submit challenges; list/detail; detail
+   includes the AI-structured brief once analyzed.
+4. **AI** — `POST /api/projects/{id}/analyze` (raw requirements → structured
+   brief), `GET /api/students/me/recommendations` (AI-matched projects for a
+   student), `GET /api/projects/{id}/recommendations` (matched students +
+   mentors for a project) — every match includes a `matchScore` and `reasons`.
+5. **Apply & Team** — students submit proposals, organizations accept them
+   (team formation begins), mentors join via `POST /api/projects/{id}/mentors`,
+   `GET /api/projects/{id}/team` returns the assembled team.
+
+No payments, contracts/milestones, escrow, messaging, or reviews anywhere in
+this contract — keep it that way.
+
 ## Team & Roles
 
 Four engineers, clear ownership boundaries, shared contracts instead of

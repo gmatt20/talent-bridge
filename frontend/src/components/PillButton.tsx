@@ -6,18 +6,26 @@ import { buttonVariants } from '@/components/ui/button'
 
 type PillButtonProps = React.ComponentProps<'button'> & {
   asChild?: boolean
-  tone?: 'solid' | 'outline'
+  tone?: 'solid' | 'outline' | 'light' | 'light-outline'
   size?: 'default' | 'sm'
 }
 
-const PILL_VARIANT = { solid: 'pill', outline: 'pill-outline' } as const
+const PILL_VARIANT = {
+  solid: 'pill',
+  outline: 'pill-outline',
+  light: 'pill-light',
+  'light-outline': 'pill-light-outline',
+} as const
 
 const CHIP_TONE = {
   solid: 'bg-card text-foreground',
   outline: 'bg-primary text-primary-foreground',
+  light: 'bg-indigo text-white',
+  'light-outline': 'bg-white text-indigo',
 }
 
 // Signature call to action: a pill with a circular arrow chip on the right.
+// The light tones are for dark or photographic backgrounds.
 export function PillButton({
   asChild = false,
   tone = 'solid',

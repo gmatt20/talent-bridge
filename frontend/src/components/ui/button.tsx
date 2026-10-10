@@ -20,6 +20,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         pill: "lift border-primary bg-primary text-primary-foreground",
         "pill-outline": "lift border-line-strong bg-card text-foreground",
+        "pill-light": "lift border-white bg-white text-coal",
+        "pill-light-outline":
+          "border-white bg-transparent text-white transition-colors hover:bg-white/15",
       },
       size: {
         default:

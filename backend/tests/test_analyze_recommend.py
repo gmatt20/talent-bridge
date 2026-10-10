@@ -1,18 +1,17 @@
-"""Analyze + recommend tests, with Bedrock stubbed so no network/credentials needed."""
+"""Analyze and recommend tests, with Bedrock stubbed (no network needed)."""
 
-from unittest.mock import patch
+from unittest import mock
 
-from app.ai.analyze import analyze_project
-from app.ai.recommend import (
-    recommend_mentors,
-    recommend_projects_for_student,
-    recommend_students,
-)
-from app.ai.schemas import ProjectRef
-
+from app.ai import analyze
+from app.ai import bedrock
+from app.ai import recommend
+from app.ai import schemas
 
 FAKE_BRIEF_JSON = {
-    "objectives": ["Enable one-click volunteer sign-up", "Reduce coordinator phone time"],
+    "objectives": [
+        "Enable one-click volunteer sign-up",
+        "Reduce coordinator phone time",
+    ],
     "deliverables": ["Public sign-up page", "Admin roster view"],
     "suggested_skills": ["React", "TypeScript", "Python"],
     "milestones": [
@@ -22,12 +21,21 @@ FAKE_BRIEF_JSON = {
     "scope": "3-month project, ~10 hrs/week",
 }
 
-FAKE_REASONS = {"reasons": ["Matches required React skills", "Available 10 hrs/week"]}
+FAKE_REASONS = {
+    "reasons": ["Matches required React skills", "Available 10 hrs/week"]
+}
+
+_INVOKE_JSON = "app.ai.bedrock.invoke_json"
+
+
+def _fake_brief(catalog, title="x", description="y", **kwargs):
+    with mock.patch(_INVOKE_JSON, return_value=FAKE_BRIEF_JSON):
+        return analyze.analyze_project(title, description, catalog, **kwargs)
 
 
 def test_analyze_project_parses_response(catalog):
-    with patch("app.ai.analyze.invoke_json", return_value=FAKE_BRIEF_JSON):
-        brief = analyze_project(
+    with mock.patch(_INVOKE_JSON, return_value=FAKE_BRIEF_JSON):
+        brief = analyze.analyze_project(
             title="Volunteer Scheduling App",
             description="raw text",
             skills_catalog=catalog,
@@ -42,21 +50,19 @@ def test_analyze_project_parses_response(catalog):
 
 
 def test_analyze_falls_back_on_bedrock_error(catalog):
-    from app.ai.bedrock import BedrockError
-
-    with patch("app.ai.analyze.invoke_json", side_effect=BedrockError("boom")):
-        brief = analyze_project("x", "y", catalog, deadline="2026-12-01")
-    assert brief.objectives  # non-empty fallback
-    assert brief.milestones  # default milestones
-    assert brief.suggested_skills == []
+    with mock.patch(_INVOKE_JSON, side_effect=bedrock.BedrockError("boom")):
+        brief = analyze.analyze_project(
+            "x", "y", catalog, deadline="2026-12-01"
+        )
+    assert brief.objectives  # Non-empty fallback.
+    assert brief.milestones  # Default milestones.
+    assert not brief.suggested_skills
 
 
 def test_recommend_students_top_n(catalog, students):
-    with patch("app.ai.analyze.invoke_json", return_value=FAKE_BRIEF_JSON), patch(
-        "app.ai.recommend.invoke_json", return_value=FAKE_REASONS
-    ):
-        brief = analyze_project("x", "y", catalog)
-        recs = recommend_students(brief, students, top_n=3)
+    brief = _fake_brief(catalog)
+    with mock.patch(_INVOKE_JSON, return_value=FAKE_REASONS):
+        recs = recommend.recommend_students(brief, students, top_n=3)
     assert len(recs) == 3
     scores = [r.match_score for r in recs]
     assert scores == sorted(scores, reverse=True)
@@ -65,38 +71,35 @@ def test_recommend_students_top_n(catalog, students):
 
 
 def test_recommend_mentors(catalog, mentors):
-    with patch("app.ai.analyze.invoke_json", return_value=FAKE_BRIEF_JSON), patch(
-        "app.ai.recommend.invoke_json", return_value=FAKE_REASONS
-    ):
-        brief = analyze_project("x", "y", catalog)
-        recs = recommend_mentors(brief, mentors, top_n=2)
+    brief = _fake_brief(catalog)
+    with mock.patch(_INVOKE_JSON, return_value=FAKE_REASONS):
+        recs = recommend.recommend_mentors(brief, mentors, top_n=2)
     assert len(recs) == 2
     assert all(r.reasons for r in recs)
 
 
 def test_recommend_projects_for_student(catalog, students, seed):
     ana = next(s for s in students if s.name == "Ana Reyes")
-    with patch("app.ai.analyze.invoke_json", return_value=FAKE_BRIEF_JSON), patch(
-        "app.ai.recommend.invoke_json", return_value=FAKE_REASONS
-    ):
-        pairs = []
-        for p in seed["projects"]:
-            brief = analyze_project(p["title"], p["description"], catalog, deadline=p["deadline"])
-            pairs.append(
-                (ProjectRef(id=p["id"], title=p["title"], organization_name=p["organization_name"]), brief)
-            )
-        recs = recommend_projects_for_student(ana, pairs, top_n=3)
+    pairs = []
+    for p in seed["projects"]:
+        ref = schemas.ProjectRef(
+            id=p["id"],
+            title=p["title"],
+            organization_name=p["organization_name"],
+        )
+        brief = _fake_brief(
+            catalog, p["title"], p["description"], deadline=p["deadline"]
+        )
+        pairs.append((ref, brief))
+    with mock.patch(_INVOKE_JSON, return_value=FAKE_REASONS):
+        recs = recommend.recommend_projects_for_student(ana, pairs, top_n=3)
     assert len(recs) == 3
     assert recs[0].match_score >= recs[-1].match_score
 
 
 def test_deterministic_fallback_when_reasons_fail(catalog, students):
-    from app.ai.bedrock import BedrockError
-
-    with patch("app.ai.analyze.invoke_json", return_value=FAKE_BRIEF_JSON), patch(
-        "app.ai.recommend.invoke_json", side_effect=BedrockError("down")
-    ):
-        brief = analyze_project("x", "y", catalog)
-        recs = recommend_students(brief, students, top_n=2)
+    brief = _fake_brief(catalog)
+    with mock.patch(_INVOKE_JSON, side_effect=bedrock.BedrockError("down")):
+        recs = recommend.recommend_students(brief, students, top_n=2)
     for r in recs:
-        assert r.reasons  # deterministic fallback kicks in
+        assert r.reasons  # The deterministic fallback kicks in.

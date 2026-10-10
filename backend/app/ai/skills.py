@@ -1,43 +1,59 @@
-"""Fuzzy skill-name resolver. AI returns names; we snap them to catalog IDs.
+"""Fuzzy skill-name resolver: the AI returns names, we snap them to the catalog.
 
-Lives in-memory (no DB access) to keep the AI module testable in isolation.
-Matthew's HTTP handler passes in the catalog loaded from Postgres.
+Works in memory (no database access) to keep the AI module testable in
+isolation; the HTTP handler passes in the catalog loaded from Postgres.
 """
 
-from __future__ import annotations
+import difflib
 
-from difflib import SequenceMatcher
-
-from .schemas import Skill
+from app.ai import schemas
 
 MATCH_THRESHOLD = 0.72
 
 
+def _best_match(
+    needle: str,
+    catalog: list[tuple[schemas.Skill, str]],
+    threshold: float,
+) -> schemas.Skill | None:
+    best_ratio = threshold
+    best_skill = None
+    for skill, haystack in catalog:
+        ratio = difflib.SequenceMatcher(None, needle, haystack).ratio()
+        if ratio >= threshold and (best_skill is None or ratio > best_ratio):
+            best_ratio = ratio
+            best_skill = skill
+    return best_skill
+
+
 def resolve_skills(
     names: list[str],
-    catalog: list[Skill],
+    catalog: list[schemas.Skill],
     threshold: float = MATCH_THRESHOLD,
-) -> list[Skill]:
-    """Map model-produced skill names to catalog entries by fuzzy similarity.
+) -> list[schemas.Skill]:
+    """Maps model-produced skill names to catalog entries by fuzzy similarity.
 
-    Dedupes by skill id. Unknown names are silently dropped — handlers can
-    inspect `len(resolve_skills(...)) < len(names)` to detect misses.
+    Dedupes by skill id. Unknown names are silently dropped; handlers can
+    compare `len(resolve_skills(...)) < len(names)` to detect misses.
+
+    Args:
+        names: Skill names from the model.
+        catalog: The skills to match against.
+        threshold: The minimum similarity ratio (0 to 1) for a match.
+
+    Returns:
+        The matched catalog skills, in the order of `names`.
     """
     if not names or not catalog:
         return []
     normalized_catalog = [(s, s.name.lower()) for s in catalog]
-    out: list[Skill] = []
+    out: list[schemas.Skill] = []
     seen: set[int] = set()
     for raw in names:
         if not isinstance(raw, str) or not raw.strip():
             continue
-        needle = raw.strip().lower()
-        best: tuple[float, Skill] | None = None
-        for skill, hay in normalized_catalog:
-            ratio = SequenceMatcher(None, needle, hay).ratio()
-            if ratio >= threshold and (best is None or ratio > best[0]):
-                best = (ratio, skill)
-        if best and best[1].id not in seen:
-            out.append(best[1])
-            seen.add(best[1].id)
+        best = _best_match(raw.strip().lower(), normalized_catalog, threshold)
+        if best and best.id not in seen:
+            out.append(best)
+            seen.add(best.id)
     return out

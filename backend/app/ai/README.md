@@ -1,38 +1,40 @@
 # AI module
 
 Internal library for Talent Bridge's AI matchmaking. **No HTTP, no DB** — the
-backend handler imports these functions, passes plain dicts/objects, and gets
-Pydantic models back that it serializes to JSON.
+backend handler imports these modules (per the repo's Python style: modules,
+not individual functions), passes plain dicts/objects, and gets Pydantic models
+back that it serializes to JSON.
 
 ## Integration contract
 
 ```python
-from app.ai import (
-    analyze_project,
-    recommend_students,
-    recommend_mentors,
-    recommend_projects_for_student,
-    Skill, StudentProfile, MentorProfile, ProjectRef,
-)
+from app.ai import analyze
+from app.ai import recommend
+from app.ai import schemas
 
 # 1. POST /api/projects/{id}/analyze
-brief = analyze_project(
+brief = analyze.analyze_project(
     title=row["title"],
     description=row["description"],
-    skills_catalog=[Skill(id=r["id"], name=r["name"]) for r in catalog_rows],
+    skills_catalog=[
+        schemas.Skill(id=r["id"], name=r["name"]) for r in catalog_rows
+    ],
     deadline=row["deadline"],
 )
 # brief.model_dump() is the response body. Also persist to project_briefs,
 # milestones, project_brief_skills tables.
 
 # 2. GET /api/projects/{id}/recommendations
-recs = recommend_students(brief, students, top_n=5)
-mentor_recs = recommend_mentors(brief, mentors, top_n=3)
+recs = recommend.recommend_students(brief, students, top_n=5)
+mentor_recs = recommend.recommend_mentors(brief, mentors, top_n=3)
 # [r.model_dump() for r in recs]  →  response body
 
 # 3. GET /api/students/me/recommendations
-pairs = [(ProjectRef(**ref), stored_brief) for ref, stored_brief in analyzed_projects]
-proj_recs = recommend_projects_for_student(me, pairs, top_n=10)
+pairs = [
+    (schemas.ProjectRef(**ref), stored_brief)
+    for ref, stored_brief in analyzed_projects
+]
+proj_recs = recommend.recommend_projects_for_student(me, pairs, top_n=10)
 ```
 
 ## Design decisions

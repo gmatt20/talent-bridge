@@ -1,26 +1,20 @@
-"""Run an end-to-end AI flow against the seed data. Requires live Bedrock access.
+"""Runs an end-to-end AI flow against the seed data. Needs live Bedrock access.
 
 Usage:
     uv run python -m app.ai.demo
 
-Prereq: `aws login --profile AsherC` so Bedrock calls can authenticate.
+Prerequisite: `aws login --profile AsherC` so Bedrock calls can authenticate.
 """
-
-from __future__ import annotations
 
 import json
 import os
-from pathlib import Path
+import pathlib
 
-from . import (
-    analyze_project,
-    recommend_mentors,
-    recommend_projects_for_student,
-    recommend_students,
-)
-from .schemas import MentorProfile, ProjectRef, Skill, StudentProfile
+from app.ai import analyze
+from app.ai import recommend
+from app.ai import schemas
 
-_SEED = Path(__file__).parent.parent / "data" / "seed.json"
+_SEED = pathlib.Path(__file__).parent.parent / "data" / "seed.json"
 
 
 def _load_seed() -> dict:
@@ -28,16 +22,22 @@ def _load_seed() -> dict:
         return json.load(f)
 
 
+def _print_reasons(reasons: list[str]) -> None:
+    for reason in reasons:
+        print(f"    · {reason}")
+
+
 def main() -> None:
+    """Analyzes the seed projects and prints the recommendations for each."""
     os.environ.setdefault("AWS_PROFILE", "AsherC")
     seed = _load_seed()
-    catalog = [Skill(**s) for s in seed["skills"]]
-    students = [StudentProfile(**s) for s in seed["students"]]
-    mentors = [MentorProfile(**m) for m in seed["mentors"]]
+    catalog = [schemas.Skill(**s) for s in seed["skills"]]
+    students = [schemas.StudentProfile(**s) for s in seed["students"]]
+    mentors = [schemas.MentorProfile(**m) for m in seed["mentors"]]
     project = seed["projects"][0]
 
     print(f"\n=== Analyzing: {project['title']} ===")
-    brief = analyze_project(
+    brief = analyze.analyze_project(
         title=project["title"],
         description=project["description"],
         skills_catalog=catalog,
@@ -46,33 +46,35 @@ def main() -> None:
     print(json.dumps(brief.model_dump(), indent=2))
 
     print("\n=== Top student matches ===")
-    for rec in recommend_students(brief, students, top_n=3):
+    for rec in recommend.recommend_students(brief, students, top_n=3):
         print(f"  {rec.student.name} — score={rec.match_score}")
-        for r in rec.reasons:
-            print(f"    · {r}")
+        _print_reasons(rec.reasons)
 
     print("\n=== Top mentor matches ===")
-    for rec in recommend_mentors(brief, mentors, top_n=2):
+    for rec in recommend.recommend_mentors(brief, mentors, top_n=2):
         print(f"  {rec.mentor.name} — score={rec.match_score}")
-        for r in rec.reasons:
-            print(f"    · {r}")
+        _print_reasons(rec.reasons)
 
     print("\n=== Project recommendations for Ana Reyes ===")
     ana = next(s for s in students if s.name == "Ana Reyes")
-    # Build (ref, brief) pairs. For the demo, we analyze all three projects.
+    # Build (ref, brief) pairs. For the demo, analyze all the seed projects.
     pairs = []
     for p in seed["projects"]:
-        b = analyze_project(
+        project_brief = analyze.analyze_project(
             title=p["title"],
             description=p["description"],
             skills_catalog=catalog,
             deadline=p["deadline"],
         )
-        pairs.append((ProjectRef(id=p["id"], title=p["title"], organization_name=p["organization_name"]), b))
-    for rec in recommend_projects_for_student(ana, pairs, top_n=3):
+        ref = schemas.ProjectRef(
+            id=p["id"],
+            title=p["title"],
+            organization_name=p["organization_name"],
+        )
+        pairs.append((ref, project_brief))
+    for rec in recommend.recommend_projects_for_student(ana, pairs, top_n=3):
         print(f"  {rec.project.title} — score={rec.match_score}")
-        for r in rec.reasons:
-            print(f"    · {r}")
+        _print_reasons(rec.reasons)
 
 
 if __name__ == "__main__":

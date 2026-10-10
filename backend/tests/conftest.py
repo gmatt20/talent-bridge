@@ -1,29 +1,39 @@
+"""Shared pytest fixtures: the seed data as AI-module objects."""
+
+# Pytest injects fixtures by parameter name, which shadows the fixture
+# functions by design.
+# pylint: disable=redefined-outer-name
+
 import json
-from pathlib import Path
+import pathlib
 
 import pytest
 
-from app.ai.schemas import MentorProfile, Skill, StudentProfile
+from app.ai import schemas
 
-SEED_PATH = Path(__file__).parent.parent / "app" / "data" / "seed.json"
+SEED_PATH = pathlib.Path(__file__).parent.parent / "app" / "data" / "seed.json"
 
 
 @pytest.fixture(scope="session")
 def seed():
+    """The parsed app/data/seed.json."""
     with SEED_PATH.open() as f:
         return json.load(f)
 
 
 @pytest.fixture(scope="session")
 def catalog(seed):
-    return [Skill(**s) for s in seed["skills"]]
+    """The seed skill catalog."""
+    return [schemas.Skill(**s) for s in seed["skills"]]
 
 
 @pytest.fixture(scope="session")
 def students(seed):
-    return [StudentProfile(**s) for s in seed["students"]]
+    """The seed students."""
+    return [schemas.StudentProfile(**s) for s in seed["students"]]
 
 
 @pytest.fixture(scope="session")
 def mentors(seed):
-    return [MentorProfile(**m) for m in seed["mentors"]]
+    """The seed mentors."""
+    return [schemas.MentorProfile(**m) for m in seed["mentors"]]

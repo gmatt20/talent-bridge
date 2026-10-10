@@ -1,17 +1,25 @@
 import {useEffect, useState, type DependencyList} from 'react';
 
-interface ApiState<T> {
+/** The result of {@link useApi}: the latest data or error, and reload. */
+export interface ApiState<T> {
   data?: T;
   error?: Error;
   loading: boolean;
+  /** Fetches again, keeping the current data visible meanwhile. */
+  reload: () => void;
 }
+
+type LoadState<T> = Omit<ApiState<T>, 'reload'>;
 
 /**
  * Loads data with `fn` and tracks its loading and error state. Reloads when
  * `deps` change or `reload()` is called; a stale response is ignored.
  */
-export function useApi<T>(fn: () => Promise<T>, deps: DependencyList) {
-  const [state, setState] = useState<ApiState<T>>({loading: true});
+export function useApi<T>(
+  fn: () => Promise<T>,
+  deps: DependencyList,
+): ApiState<T> {
+  const [state, setState] = useState<LoadState<T>>({loading: true});
   const [nonce, setNonce] = useState(0);
 
   useEffect(() => {

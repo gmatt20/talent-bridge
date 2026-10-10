@@ -1,8 +1,8 @@
-import { Link, Navigate } from 'react-router'
-import { FileText, Handshake, Sparkles, Users } from 'lucide-react'
-import { homePath, useAuth } from '@/auth/AuthContext'
-import { HeroVideo } from '@/components/HeroVideo'
-import { PillButton } from '@/components/PillButton'
+import {Link, Navigate} from 'react-router';
+import {FileText, Handshake, Sparkles, Users} from 'lucide-react';
+import {homePath, useAuth} from '../auth/AuthContext';
+import {HeroVideo} from '../components/HeroVideo';
+import {PillButton} from '../components/PillButton';
 
 const STEPS = [
   {
@@ -25,11 +25,12 @@ const STEPS = [
     title: 'Build it together',
     body: 'You choose who joins. The team forms and gets to work on a real community project.',
   },
-]
+];
 
-export default function Landing() {
-  const { user } = useAuth()
-  if (user) return <Navigate to={homePath(user.role)} replace />
+/** The public home page; signed-in users go straight to their dashboard. */
+export function Landing() {
+  const {user} = useAuth();
+  if (user) return <Navigate to={homePath(user.role)} replace />;
 
   return (
     <>
@@ -44,12 +45,15 @@ export default function Landing() {
             Local challenges, meet local talent.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/90 text-pretty">
-            Talent Bridge connects Orange County businesses and nonprofits with students ready to solve real
-            problems, so good ideas don't stall for lack of hands.
+            Talent Bridge connects Orange County businesses and nonprofits with
+            students ready to solve real problems, so good ideas don't stall for
+            lack of hands.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <PillButton asChild tone="light">
-              <Link to="/register?role=organization">I'm a business or nonprofit</Link>
+              <Link to="/register?role=organization">
+                I'm a business or nonprofit
+              </Link>
             </PillButton>
             <PillButton asChild tone="light-outline">
               <Link to="/register?role=student">I'm a student</Link>
@@ -58,19 +62,30 @@ export default function Landing() {
         </div>
       </section>
 
-      <section aria-labelledby="how-heading" className="border-b-2 border-line-strong bg-card">
+      <section
+        aria-labelledby="how-heading"
+        className="border-b-2 border-line-strong bg-card"
+      >
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 id="how-heading" className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]">
+          <h2
+            id="how-heading"
+            className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]"
+          >
             How it works
           </h2>
           <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <li key={title} className="rounded-2xl border-2 border-line-strong bg-background p-5">
+            {STEPS.map(({icon: Icon, title, body}, i) => (
+              <li
+                key={title}
+                className="rounded-2xl border-2 border-line-strong bg-background p-5"
+              >
                 <div className="flex items-center justify-between">
                   <span className="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden />
                   </span>
-                  <span className="eyebrow text-muted-foreground">Step {i + 1}</span>
+                  <span className="eyebrow text-muted-foreground">
+                    Step {i + 1}
+                  </span>
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">{title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{body}</p>
@@ -84,19 +99,25 @@ export default function Landing() {
         <div className="relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-primary p-8 pb-16 text-primary-foreground sm:p-12 sm:pb-20 md:flex-row md:items-center md:justify-between">
           <BridgeArches />
           <div className="relative max-w-xl">
-            <h2 className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]">AI recommends. People decide.</h2>
+            <h2 className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]">
+              AI recommends. People decide.
+            </h2>
             <p className="mt-2 text-primary-foreground/80">
-              Our AI helps with the busywork of writing briefs and finding good fits. Every decision about who
-              works on what stays with you.
+              Our AI helps with the busywork of writing briefs and finding good
+              fits. Every decision about who works on what stays with you.
             </p>
           </div>
-          <PillButton asChild tone="outline" className="relative self-start md:self-auto">
+          <PillButton
+            asChild
+            tone="outline"
+            className="relative self-start md:self-auto"
+          >
             <Link to="/projects">Browse open projects</Link>
           </PillButton>
         </div>
       </section>
     </>
-  )
+  );
 }
 
 // The brand motif: half-circle spans cut along the bottom edge, like a viaduct.
@@ -106,5 +127,5 @@ function BridgeArches() {
       aria-hidden
       className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-[radial-gradient(circle_at_50%_100%,var(--background)_26px,transparent_27px)] bg-[length:72px_32px] bg-bottom bg-repeat-x"
     />
-  )
+  );
 }

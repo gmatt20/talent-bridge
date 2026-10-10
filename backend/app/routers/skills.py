@@ -1,18 +1,20 @@
-from __future__ import annotations
+"""Skill catalog search, used to tag students and projects."""
 
-import psycopg
-from fastapi import APIRouter, Depends
+from typing import Any
 
-from .. import schemas as s
-from ..deps import get_db
+import fastapi
 
-router = APIRouter()
+from app import deps
+from app import schemas
+
+router = fastapi.APIRouter()
 
 
-@router.get("/api/skills", response_model=list[s.Skill])
-def search_skills(q: str = "", db: psycopg.Connection = Depends(get_db)):
-    rows = db.execute(
-        "SELECT id, name FROM skills WHERE name ILIKE %s ORDER BY name LIMIT 10",
+@router.get("/api/skills", response_model=list[schemas.Skill])
+def search_skills(db: deps.Db, q: str = "") -> list[dict[str, Any]]:
+    """Searches skills by name (case-insensitive), returning up to 10."""
+    return db.execute(
+        "SELECT id, name FROM skills WHERE name ILIKE %s "
+        "ORDER BY name LIMIT 10",
         (f"%{q}%",),
     ).fetchall()
-    return rows

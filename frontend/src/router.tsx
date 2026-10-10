@@ -1,24 +1,25 @@
-import { createBrowserRouter } from 'react-router'
-import { RequireRole } from '@/auth/RequireRole'
-import { AppShell } from '@/components/layout/AppShell'
-import Landing from '@/pages/Landing'
-import Login from '@/pages/Login'
-import NotFound from '@/pages/NotFound'
-import NewProject from '@/pages/org/NewProject'
-import OrgDashboard from '@/pages/org/OrgDashboard'
-import OrgProjectDetail from '@/pages/org/OrgProjectDetail'
-import OrgOnboarding from '@/pages/onboarding/OrgOnboarding'
-import Register from '@/pages/Register'
-import StudentDashboard from '@/pages/StudentDashboard'
-import StudentOnboarding from '@/pages/onboarding/StudentOnboarding'
+import {createBrowserRouter} from 'react-router';
+import {RequireRole} from './auth/RequireRole';
+import {AppShell} from './components/layout/AppShell';
+import {Landing} from './pages/Landing';
+import {Login} from './pages/Login';
+import {NotFound} from './pages/NotFound';
+import {NewProject} from './pages/org/NewProject';
+import {OrgDashboard} from './pages/org/OrgDashboard';
+import {OrgProjectDetail} from './pages/org/OrgProjectDetail';
+import {OrgOnboarding} from './pages/onboarding/OrgOnboarding';
+import {Register} from './pages/Register';
+import {StudentDashboard} from './pages/StudentDashboard';
+import {StudentOnboarding} from './pages/onboarding/StudentOnboarding';
 
+/** The app's routes; role-gated pages are wrapped in `RequireRole`. */
 export const router = createBrowserRouter([
   {
     element: <AppShell />,
     children: [
-      { index: true, element: <Landing /> },
-      { path: 'login', element: <Login /> },
-      { path: 'register', element: <Register /> },
+      {index: true, element: <Landing />},
+      {path: 'login', element: <Login />},
+      {path: 'register', element: <Register />},
       {
         path: 'onboarding/student',
         element: (
@@ -67,7 +68,7 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
       },
-      { path: '*', element: <NotFound /> },
+      {path: '*', element: <NotFound />},
     ],
   },
-])
+]);

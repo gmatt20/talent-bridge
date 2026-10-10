@@ -1,13 +1,16 @@
-import type * as React from 'react'
-import { ArrowRight } from 'lucide-react'
-import { Slot } from 'radix-ui'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import type * as React from 'react';
+import {ArrowRight} from 'lucide-react';
+import {Slot} from 'radix-ui';
+import {cn} from '../lib/utils';
+import {buttonVariants} from './ui/button';
 
-type PillButtonProps = React.ComponentProps<'button'> & {
-  asChild?: boolean
-  tone?: 'solid' | 'outline' | 'light' | 'light-outline'
-  size?: 'default' | 'sm'
+/** Props for {@link PillButton}. */
+export interface PillButtonProps extends React.ComponentProps<'button'> {
+  /** Render the child element (usually a router `Link`) instead of a button. */
+  asChild?: boolean;
+  /** Use the light tones on dark or photographic backgrounds. */
+  tone?: 'solid' | 'outline' | 'light' | 'light-outline';
+  size?: 'default' | 'sm';
 }
 
 const PILL_VARIANT = {
@@ -15,17 +18,16 @@ const PILL_VARIANT = {
   outline: 'pill-outline',
   light: 'pill-light',
   'light-outline': 'pill-light-outline',
-} as const
+} as const;
 
 const CHIP_TONE = {
   solid: 'bg-card text-foreground',
   outline: 'bg-primary text-primary-foreground',
   light: 'bg-indigo text-white',
   'light-outline': 'bg-white text-indigo',
-}
+};
 
-// Signature call to action: a pill with a circular arrow chip on the right.
-// The light tones are for dark or photographic backgrounds.
+/** The signature call to action: a pill with a circular arrow chip. */
 export function PillButton({
   asChild = false,
   tone = 'solid',
@@ -34,7 +36,7 @@ export function PillButton({
   children,
   ...props
 }: PillButtonProps) {
-  const Comp = asChild ? Slot.Root : 'button'
+  const Comp = asChild ? Slot.Root : 'button';
   return (
     <Comp
       className={cn(
@@ -59,5 +61,5 @@ export function PillButton({
         <ArrowRight className="size-4" />
       </span>
     </Comp>
-  )
+  );
 }

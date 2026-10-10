@@ -1,14 +1,14 @@
-import { Link } from 'react-router'
-import { Sparkles } from 'lucide-react'
-import { useAuth } from '@/auth/AuthContext'
-import { EmptyState } from '@/components/EmptyState'
-import { PageHeader } from '@/components/PageHeader'
-import { PillButton } from '@/components/PillButton'
-import { Button } from '@/components/ui/button'
+import {Link} from 'react-router';
+import {Sparkles} from 'lucide-react';
+import {useAuth} from '../auth/AuthContext';
+import {EmptyState} from '../components/EmptyState';
+import {PageHeader} from '../components/PageHeader';
+import {PillButton} from '../components/PillButton';
+import {Button} from '../components/ui/button';
 
-// Placeholder until Phase 3 adds AI recommendations here.
-export default function StudentDashboard() {
-  const { user } = useAuth()
+/** The student's home. A placeholder until Phase 3 adds recommendations. */
+export function StudentDashboard() {
+  const {user} = useAuth();
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6">
       <PageHeader
@@ -32,5 +32,5 @@ export default function StudentDashboard() {
         }
       />
     </div>
-  )
+  );
 }

@@ -6,20 +6,38 @@ import type {
   ProjectRecommendations,
   ProjectSummary,
   Team,
-} from '@/types/api'
-import { request } from './client'
+} from '../types/api';
+import {request} from './client';
 
-export const list = () => request<Paginated<ProjectSummary>>('GET', '/api/projects')
+/** Lists open projects. */
+export function list() {
+  return request<Paginated<ProjectSummary>>('GET', '/api/projects');
+}
 
-export const get = (id: number) => request<Project>('GET', `/api/projects/${id}`)
+/** Loads a project, including its AI brief once analyzed. */
+export function get(id: number) {
+  return request<Project>('GET', `/api/projects/${id}`);
+}
 
-export const create = (body: CreateProjectRequest) =>
-  request<Project>('POST', '/api/projects', body)
+/** Submits a new challenge for the signed-in organization. */
+export function create(body: CreateProjectRequest) {
+  return request<Project>('POST', '/api/projects', body);
+}
 
-export const analyze = (id: number) =>
-  request<ProjectBrief>('POST', `/api/projects/${id}/analyze`)
+/** Asks the AI to turn a project's description into a structured brief. */
+export function analyze(id: number) {
+  return request<ProjectBrief>('POST', `/api/projects/${id}/analyze`);
+}
 
-export const recommendations = (id: number) =>
-  request<ProjectRecommendations>('GET', `/api/projects/${id}/recommendations`)
+/** Loads the students and mentors the AI recommends for a project. */
+export function recommendations(id: number) {
+  return request<ProjectRecommendations>(
+    'GET',
+    `/api/projects/${id}/recommendations`,
+  );
+}
 
-export const team = (id: number) => request<Team>('GET', `/api/projects/${id}/team`)
+/** Loads the team formed around a project. */
+export function team(id: number) {
+  return request<Team>('GET', `/api/projects/${id}/team`);
+}

@@ -1,22 +1,23 @@
-from __future__ import annotations
+"""Registration, login and the current user."""
 
 import re
 import psycopg
 from fastapi import APIRouter, Depends, HTTPException
 
-from .. import repo
-from .. import schemas as s
-from ..core.security import create_token, hash_password, verify_password
-from ..deps import get_current_user, get_db
+import fastapi
 
-router = APIRouter()
+from app import deps
+from app import repo
+from app import schemas
+from app.core import security
 
-VALID_ROLES = {"organization", "student", "mentor"}
+router = fastapi.APIRouter()
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
-def _user_out(row: dict) -> dict:
+
+def _user_out(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": row["id"],
         "role": row["role"],
@@ -26,14 +27,17 @@ def _user_out(row: dict) -> dict:
     }
 
 
-@router.post("/api/auth/register", response_model=s.AuthResponse, status_code=201)
-def register(body: s.RegisterRequest, db: psycopg.Connection = Depends(get_db)):
+@router.post(
+    "/api/auth/register", response_model=schemas.AuthResponse, status_code=201
+)
+def register(body: schemas.RegisterRequest, db: deps.Db) -> dict[str, Any]:
+    """Creates an account and its empty profile, and signs it in."""
     if body.role not in VALID_ROLES:
-        raise HTTPException(400, "Choose a role.")
+        raise fastapi.HTTPException(status_code=400, detail="Choose a role.")
     name = body.name.strip()
     email = body.email.strip().lower()
     if not name:
-        raise HTTPException(400, "Name is required.")
+        raise fastapi.HTTPException(status_code=400, detail="Name is required.")
     if not email:
         raise HTTPException(400, "Email is required.")
     if not EMAIL_RE.match(email):
@@ -41,35 +45,51 @@ def register(body: s.RegisterRequest, db: psycopg.Connection = Depends(get_db)):
     if len(body.password_hash) < 8:
         raise HTTPException(400, "Password must be at least 8 characters.")
 
-    existing = db.execute("SELECT 1 FROM users WHERE email = %s", (email,)).fetchone()
+    existing = db.execute(
+        "SELECT 1 FROM users WHERE email = %s", (email,)
+    ).fetchone()
     if existing:
-        raise HTTPException(409, "An account with this email already exists.")
+        raise fastapi.HTTPException(
+            status_code=409,
+            detail="An account with this email already exists.",
+        )
 
     existing = db.execute("SELECT 1 FROM users WHERE LOWER(name) = LOWER(%s)", (name,)).fetchone()
     if existing:
         raise HTTPException(409, "An account with this name already exists.")
 
     row = db.execute(
-        "INSERT INTO users (role, email, password_hash, name) VALUES (%s, %s, %s, %s) "
+        "INSERT INTO users (role, email, password_hash, name) "
+        "VALUES (%s, %s, %s, %s) "
         "RETURNING id, role, email::text, name, created_at",
         (body.role, email, hash_password(body.password_hash), name),
     ).fetchone()
 
     if body.role == "organization":
-        db.execute("INSERT INTO organizations (user_id, company_name) VALUES (%s, %s)", (row["id"], name))
+        db.execute(
+            "INSERT INTO organizations (user_id, company_name) "
+            "VALUES (%s, %s)",
+            (row["id"], name),
+        )
     elif body.role == "student":
-        db.execute("INSERT INTO student_profiles (user_id) VALUES (%s)", (row["id"],))
+        db.execute(
+            "INSERT INTO student_profiles (user_id) VALUES (%s)", (row["id"],)
+        )
     elif body.role == "mentor":
-        db.execute("INSERT INTO mentor_profiles (user_id) VALUES (%s)", (row["id"],))
+        db.execute(
+            "INSERT INTO mentor_profiles (user_id) VALUES (%s)", (row["id"],)
+        )
 
-    return {"token": create_token(row["id"]), "user": _user_out(row)}
+    return {"token": security.create_token(row["id"]), "user": _user_out(row)}
 
 
-@router.post("/api/auth/login", response_model=s.AuthResponse)
-def login(body: s.LoginRequest, db: psycopg.Connection = Depends(get_db)):
+@router.post("/api/auth/login", response_model=schemas.AuthResponse)
+def login(body: schemas.LoginRequest, db: deps.Db) -> dict[str, Any]:
+    """Signs in with an email and password."""
     email = body.email.strip().lower()
     row = db.execute(
-        "SELECT id, role, email::text, name, password_hash, created_at FROM users WHERE email = %s",
+        "SELECT id, role, email::text, name, password_hash, created_at "
+        "FROM users WHERE email = %s",
         (email,),
     ).fetchone()
     if not row:

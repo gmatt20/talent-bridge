@@ -1,11 +1,28 @@
-import type { Organization, Paginated, ProjectSummary } from '@/types/api'
-import { request } from './client'
+import type {Organization, Paginated, ProjectSummary} from '../types/api';
+import {request} from './client';
 
-export const get = (id: number) => request<Organization>('GET', `/api/organizations/${id}`)
+/** Loads an organization's public profile. */
+export function get(id: number) {
+  return request<Organization>('GET', `/api/organizations/${id}`);
+}
 
-// Proposed endpoints, not yet in the ARCHITECTURE.md contract.
-export const updateMe = (body: Pick<Organization, 'companyName' | 'description' | 'website'>) =>
-  request<Organization>('PUT', '/api/organizations/me', body)
+/**
+ * Updates the signed-in organization's profile. Proposed endpoint, not yet in
+ * the ARCHITECTURE.md contract.
+ */
+export function updateMe(
+  body: Pick<Organization, 'companyName' | 'description' | 'website'>,
+) {
+  return request<Organization>('PUT', '/api/organizations/me', body);
+}
 
-export const myProjects = () =>
-  request<Paginated<ProjectSummary>>('GET', '/api/organizations/me/projects')
+/**
+ * Lists the signed-in organization's projects. Proposed endpoint, not yet in
+ * the ARCHITECTURE.md contract.
+ */
+export function myProjects() {
+  return request<Paginated<ProjectSummary>>(
+    'GET',
+    '/api/organizations/me/projects',
+  );
+}

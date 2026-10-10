@@ -3,6 +3,7 @@ import {flushSync} from 'react-dom';
 import {Link, NavLink, Outlet, useNavigate} from 'react-router';
 import {ChevronDown, LogOut, Menu, X} from 'lucide-react';
 import {homePath, useAuth} from '../../auth/AuthContext';
+import {useTheme} from '../../theme/ThemeContext';
 import {PillButton} from '../PillButton';
 import {Button} from '../ui/button';
 import {
@@ -17,6 +18,7 @@ import {Toaster} from '../ui/sonner';
 import {cn} from '../../lib/utils';
 import type {Role} from '../../types/api';
 import {Logo} from './Logo';
+import {ThemeMenu} from './ThemeMenu';
 
 interface NavItem {
   to: string;
@@ -49,6 +51,7 @@ export function AppShell() {
   const {user} = useAuth();
   const navigate = useNavigate();
   const signOut = useSignOut();
+  const {resolvedTheme} = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const links = NAV[user?.role ?? 'guest'];
 
@@ -88,65 +91,68 @@ export function AppShell() {
             </nav>
           </div>
 
-          <div className="hidden items-center gap-2 md:flex">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="h-9 gap-2 rounded-full pr-2 pl-1"
-                  >
-                    <span
-                      aria-hidden
-                      className="flex size-7 items-center justify-center rounded-full bg-accent text-xs font-semibold text-primary"
+          <div className="flex items-center gap-1 md:gap-2">
+            <ThemeMenu />
+            <div className="hidden items-center gap-2 md:flex">
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="h-9 gap-2 rounded-full pr-2 pl-1"
                     >
-                      {initials(user.name)}
-                    </span>
-                    <span className="max-w-40 truncate">{user.name}</span>
-                    <ChevronDown className="size-4 text-muted-foreground" />
+                      <span
+                        aria-hidden
+                        className="flex size-7 items-center justify-center rounded-full bg-accent text-xs font-semibold text-primary"
+                      >
+                        {initials(user.name)}
+                      </span>
+                      <span className="max-w-40 truncate">{user.name}</span>
+                      <ChevronDown className="size-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="truncate">{user.name}</div>
+                      <div className="text-xs font-normal text-muted-foreground">
+                        {ROLE_LABEL[user.role]}
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => navigate(homePath(user.role))}
+                    >
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleLogout}>
+                      <LogOut /> Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild className="rounded-full">
+                    <Link to="/login">Log in</Link>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="truncate">{user.name}</div>
-                    <div className="text-xs font-normal text-muted-foreground">
-                      {ROLE_LABEL[user.role]}
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => navigate(homePath(user.role))}
-                  >
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={handleLogout}>
-                    <LogOut /> Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
-                <Button variant="ghost" asChild className="rounded-full">
-                  <Link to="/login">Log in</Link>
-                </Button>
-                <PillButton asChild size="sm">
-                  <Link to="/register">Get started</Link>
-                </PillButton>
-              </>
-            )}
-          </div>
+                  <PillButton asChild size="sm">
+                    <Link to="/register">Get started</Link>
+                  </PillButton>
+                </>
+              )}
+            </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            onClick={() => setMenuOpen(o => !o)}
-          >
-            {menuOpen ? <X /> : <Menu />}
-          </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setMenuOpen(o => !o)}
+            >
+              {menuOpen ? <X /> : <Menu />}
+            </Button>
+          </div>
         </div>
 
         {menuOpen && (
@@ -228,7 +234,7 @@ export function AppShell() {
         </div>
       </footer>
 
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors theme={resolvedTheme} />
     </div>
   );
 }

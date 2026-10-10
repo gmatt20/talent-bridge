@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#faf9f6" />
+    <meta name="theme-color" content="#f6f5fb" />
+    <script>
+      // Apply the saved or system theme before the first paint so dark mode
+      // doesn't flash white. ThemeProvider takes over once React loads.
+      (function () {
+        var theme = 'system';
+        try {
+          theme = localStorage.getItem('tb.theme') || 'system';
+        } catch (e) {}
+        var dark =
+          theme === 'dark' ||
+          (theme === 'system' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
     <meta
       name="description"
       content="Talent Bridge connects local businesses and nonprofits with students to solve real community challenges."

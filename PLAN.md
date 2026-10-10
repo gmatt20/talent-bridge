@@ -61,11 +61,13 @@ works end-to-end — do not block the MVP on it.
 
 ## Tech Stack
 
-- **Backend** — Python, stdlib `http.server` (no FastAPI/Flask/Django).
-  Postgres access via plain `psycopg`, no ORM. AWS Bedrock calls via `boto3`.
+- **Backend** — Python + FastAPI, no ORM. Postgres access via either plain
+  `psycopg` (direct TCP, needs the bastion SSH tunnel) or the RDS Data API
+  (signed HTTPS, needs only AWS credentials) — see ARCHITECTURE.md. AWS
+  Bedrock calls via `boto3`.
 - **Frontend** — React + TypeScript (Vite), Tailwind CSS v4, shadcn/ui
-- **AWS** — Bedrock for AI matchmaking/requirement-structuring; Postgres
-  for persistence (**local Postgres for hackathon dev**)
+- **AWS** — Bedrock for AI matchmaking/requirement-structuring; a shared
+  Aurora PostgreSQL cluster (`talent-bridge`, us-west-2) for persistence
 
 ## API Contract
 
@@ -114,10 +116,10 @@ questions → propose a plan → wait for confirmation before implementing.
 
 ### Backend Engineer — Infrastructure Lead
 
-- Pure Python (stdlib `http.server`) REST-style API — no web framework.
-- Postgres schema for users/orgs, challenges, students, mentors (optional),
-  matches, teams — plain SQL via `psycopg`, no ORM.
-- AWS plumbing: Postgres hosting, any file storage needed, deployment.
+- FastAPI REST API. Postgres schema for users/orgs, challenges, students,
+  mentors (optional), matches, teams — plain SQL, no ORM.
+- AWS plumbing: Aurora PostgreSQL (shared cluster, Data API enabled), any
+  file storage needed, deployment.
 - Clear, consistent JSON request/response contracts, documented for the
   frontend and AI engineer to build against.
 - Secrets via env vars only, never committed.

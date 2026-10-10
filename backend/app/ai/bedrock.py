@@ -47,7 +47,11 @@ def invoke_json(
     Strips DeepSeek R1 reasoning tags and markdown code fences before parsing.
     Raises BedrockError if the model is unreachable or returns unparseable output.
     """
-    client = _get_client()
+    try:
+        client = _get_client()
+    except Exception as e:  # noqa: BLE001 - client construction must never escape; see module contract
+        raise BedrockError(f"Bedrock client unavailable: {e}") from e
+
     model = model_id or DEFAULT_MODEL_ID
     last_err: Exception | None = None
 

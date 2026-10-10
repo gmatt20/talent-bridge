@@ -11,6 +11,10 @@ import OrgOnboarding from '@/pages/onboarding/OrgOnboarding'
 import Register from '@/pages/Register'
 import StudentDashboard from '@/pages/StudentDashboard'
 import StudentOnboarding from '@/pages/onboarding/StudentOnboarding'
+import DesignIndex from '@/pages/design/DesignIndex'
+import SundayPaper from '@/pages/design/SundayPaper'
+import BulletinBoard from '@/pages/design/BulletinBoard'
+import SoftCivic from '@/pages/design/SoftCivic'
 
 export const router = createBrowserRouter([
   {
@@ -70,4 +74,8 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFound /> },
     ],
   },
+  { path: '/design', element: <DesignIndex /> },
+  { path: '/design/sunday-paper', element: <SundayPaper /> },
+  { path: '/design/bulletin-board', element: <BulletinBoard /> },
+  { path: '/design/soft-civic', element: <SoftCivic /> },
 ])

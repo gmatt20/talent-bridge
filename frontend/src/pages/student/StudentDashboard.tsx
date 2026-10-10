@@ -8,6 +8,7 @@ import {ErrorState} from '../../components/ErrorState';
 import {PageHeader} from '../../components/PageHeader';
 import {PillButton} from '../../components/PillButton';
 import {ProposalStatusBadge} from '../../components/proposals/ProposalStatusBadge';
+import {MatchCardSkeleton} from '../../components/recommendations/MatchCardSkeleton';
 import {RecommendationCard} from '../../components/recommendations/RecommendationCard';
 import {Button} from '../../components/ui/button';
 import {Skeleton} from '../../components/ui/skeleton';
@@ -62,13 +63,21 @@ function Recommendations() {
   if (recs.loading && !recs.data) {
     return (
       <div
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="space-y-4"
         role="status"
         aria-label="Finding projects for you"
       >
-        {[0, 1, 2].map(i => (
-          <Skeleton key={i} className="h-72 rounded-2xl" />
-        ))}
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
+          Matching projects to your skills…
+        </p>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map(i => (
+            <li key={i}>
+              <MatchCardSkeleton />
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }

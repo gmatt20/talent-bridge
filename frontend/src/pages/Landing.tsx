@@ -34,9 +34,9 @@ export function Landing() {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden">
+      <section className="relative isolate flex min-h-svh items-center overflow-hidden">
         <HeroVideo />
-        <div className="mx-auto max-w-6xl px-4 pt-20 pb-24 sm:px-6 sm:pt-28 sm:pb-32">
+        <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
           <p className="eyebrow inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-white backdrop-blur-sm">
             <Sparkles className="size-3.5" aria-hidden />
             Community-powered, AI-assisted

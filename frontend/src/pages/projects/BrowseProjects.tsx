@@ -32,13 +32,9 @@ function ProjectList() {
 
   if (projects.loading && !projects.data) {
     return (
-      <div
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        role="status"
-        aria-label="Loading projects"
-      >
-        {[0, 1, 2].map(i => (
-          <Skeleton key={i} className="h-52 rounded-2xl" />
+      <div className="space-y-4" role="status" aria-label="Loading projects">
+        {[0, 1, 2, 3].map(i => (
+          <Skeleton key={i} className="h-32 rounded-2xl" />
         ))}
       </div>
     );
@@ -68,10 +64,14 @@ function ProjectList() {
       <p className="sr-only" aria-live="polite">
         {visible.length} {visible.length === 1 ? 'project' : 'projects'} shown
       </p>
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="space-y-4">
         {visible.map(p => (
           <li key={p.id}>
-            <ProjectCard project={p} to={`/projects/${p.id}`} />
+            <ProjectCard
+              project={p}
+              to={`/projects/${p.id}`}
+              orientation="row"
+            />
           </li>
         ))}
       </ul>

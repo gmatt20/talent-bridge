@@ -51,7 +51,17 @@ def update_me(
     user: deps.Student,
     db: deps.Db,
 ) -> dict[str, Any]:
-    """Updates the signed-in student's profile and replaces their skills."""
+    """Updates the signed-in student's profile and replaces their skills.
+
+    Responds 404 if any skill id isn't in the catalog.
+    """
+    if body.skill_ids:
+        known = {skill.id for skill in repo.skill_catalog(db)}
+        missing = [i for i in body.skill_ids if i not in known]
+        if missing:
+            raise fastapi.HTTPException(
+                status_code=404, detail=f"Skill {missing[0]} not found."
+            )
     db.execute(
         "UPDATE student_profiles SET headline = %s, bio = %s, "
         "availability = %s WHERE user_id = %s",

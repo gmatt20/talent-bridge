@@ -380,7 +380,13 @@ route('PUT', '/api/students/me', (ctx): StudentProfile => {
   s.bio = optString(ctx.body.bio);
   s.availability = optString(ctx.body.availability);
   if (Array.isArray(ctx.body.skillIds)) {
-    s.skillIds = ctx.body.skillIds.filter(id => typeof id === 'number');
+    const skillIds = ctx.body.skillIds.filter(id => typeof id === 'number');
+    const known = new Set(db.skills.map(skill => skill.id));
+    const missing = skillIds.find(id => !known.has(id));
+    if (missing !== undefined) {
+      throw new ApiError(404, `Skill ${missing} not found.`);
+    }
+    s.skillIds = skillIds;
   }
   return studentProfile(user.id);
 });

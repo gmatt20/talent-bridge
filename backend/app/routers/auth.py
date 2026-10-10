@@ -92,7 +92,9 @@ def login(body: schemas.LoginRequest, db: deps.Db) -> dict[str, Any]:
         "FROM users WHERE email = %s",
         (email,),
     ).fetchone()
-    if not row or not verify_password(body.password_hash, row["password_hash"]):
+    if not row:
+        raise HTTPException(401, "Invalid email or password.")
+    if not verify_password(body.password_hash, row["password_hash"]):
         raise HTTPException(401, "Invalid email or password.")
     return {"token": create_token(row["id"]), "user": _user_out(row)}
 

@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router'
 import { FileText, Handshake, Sparkles, Users } from 'lucide-react'
 import { homePath, useAuth } from '@/auth/AuthContext'
+import { HeroBridge } from '@/components/HeroBridge'
 import { PillButton } from '@/components/PillButton'
 
 const STEPS = [
@@ -32,25 +33,30 @@ export default function Landing() {
 
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
-        <p className="eyebrow inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
-          <Sparkles className="size-3.5" aria-hidden />
-          Community-powered, AI-assisted
-        </p>
-        <h1 className="font-display mt-6 max-w-4xl text-[44px] leading-[0.95] font-black tracking-[-0.01em] text-balance sm:text-[72px]">
-          Local challenges, meet local talent.
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-muted-foreground text-pretty">
-          Talent Bridge connects Orange County businesses and nonprofits with students ready to solve real
-          problems, so good ideas don't stall for lack of hands.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <PillButton asChild tone="flare">
-            <Link to="/register?role=organization">I'm a business or nonprofit</Link>
-          </PillButton>
-          <PillButton asChild tone="outline">
-            <Link to="/register?role=student">I'm a student</Link>
-          </PillButton>
+      <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-16 pb-20 sm:px-6 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <div className="min-w-0">
+          <p className="eyebrow inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
+            <Sparkles className="size-3.5" aria-hidden />
+            Community-powered, AI-assisted
+          </p>
+          <h1 className="font-display mt-6 text-[44px] leading-[0.95] font-black tracking-[-0.01em] text-balance sm:text-[64px]">
+            Local challenges, meet local talent.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg text-muted-foreground text-pretty">
+            Talent Bridge connects Orange County businesses and nonprofits with students ready to solve real
+            problems, so good ideas don't stall for lack of hands.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <PillButton asChild>
+              <Link to="/register?role=organization">I'm a business or nonprofit</Link>
+            </PillButton>
+            <PillButton asChild tone="outline">
+              <Link to="/register?role=student">I'm a student</Link>
+            </PillButton>
+          </div>
+        </div>
+        <div className="mx-auto w-full max-w-md lg:max-w-none">
+          <HeroBridge />
         </div>
       </section>
 

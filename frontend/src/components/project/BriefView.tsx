@@ -10,7 +10,7 @@ export function BriefView({ brief, actions }: { brief: ProjectBrief; actions?: R
     <section aria-labelledby="brief-heading" className="rounded-2xl border-2 border-line-strong bg-card">
       <div className="flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-flare text-coal">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Sparkles className="size-4.5" aria-hidden />
           </span>
           <div>
@@ -99,8 +99,8 @@ export function AnalyzingState() {
   return (
     <div role="status" aria-live="polite" className="flex flex-col items-center rounded-2xl border bg-card px-6 py-14 text-center">
       <span className="relative flex size-14 items-center justify-center">
-        <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flare/40 motion-reduce:hidden" />
-        <span className="relative flex size-14 items-center justify-center rounded-full bg-flare text-coal">
+        <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-primary/25 motion-reduce:hidden" />
+        <span className="relative flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Sparkles className="size-6 animate-pulse motion-reduce:animate-none" aria-hidden />
         </span>
       </span>

@@ -6,20 +6,18 @@ import { buttonVariants } from '@/components/ui/button'
 
 type PillButtonProps = React.ComponentProps<'button'> & {
   asChild?: boolean
-  tone?: 'solid' | 'outline' | 'flare'
+  tone?: 'solid' | 'outline'
   size?: 'default' | 'sm'
 }
 
-const PILL_VARIANT = { solid: 'pill', outline: 'pill-outline', flare: 'pill-flare' } as const
+const PILL_VARIANT = { solid: 'pill', outline: 'pill-outline' } as const
 
 const CHIP_TONE = {
   solid: 'bg-card text-foreground',
   outline: 'bg-primary text-primary-foreground',
-  flare: 'bg-coal text-flare',
 }
 
 // Signature call to action: a pill with a circular arrow chip on the right.
-// Use the flare tone for at most one action per screen.
 export function PillButton({
   asChild = false,
   tone = 'solid',

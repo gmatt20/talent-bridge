@@ -20,7 +20,6 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         pill: "lift border-primary bg-primary text-primary-foreground",
         "pill-outline": "lift border-line-strong bg-card text-foreground",
-        "pill-flare": "lift border-line-strong bg-flare text-coal shadow-hard-sm",
       },
       size: {
         default:

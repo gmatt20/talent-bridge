@@ -36,6 +36,11 @@ export function AuthProvider({children}: AuthProviderProps) {
       loading,
       login: body => api.auth.login(body).then(res => accept(res)),
       register: body => api.auth.register(body).then(res => accept(res)),
+      googleSignIn: async body => {
+        const res = await api.auth.googleSignIn(body);
+        accept(res);
+        return res;
+      },
       logout: () => {
         setToken(null);
         setUser(null);

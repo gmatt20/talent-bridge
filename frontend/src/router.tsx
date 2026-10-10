@@ -9,7 +9,9 @@ import {OrgDashboard} from './pages/org/OrgDashboard';
 import {OrgProjectDetail} from './pages/org/OrgProjectDetail';
 import {OrgOnboarding} from './pages/onboarding/OrgOnboarding';
 import {Register} from './pages/Register';
-import {StudentDashboard} from './pages/StudentDashboard';
+import {BrowseProjects} from './pages/projects/BrowseProjects';
+import {ProjectDetail} from './pages/projects/ProjectDetail';
+import {StudentDashboard} from './pages/student/StudentDashboard';
 import {StudentOnboarding} from './pages/onboarding/StudentOnboarding';
 
 /** The app's routes; role-gated pages are wrapped in `RequireRole`. */
@@ -68,6 +70,8 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
       },
+      {path: 'projects', element: <BrowseProjects />},
+      {path: 'projects/:id', element: <ProjectDetail />},
       {path: '*', element: <NotFound />},
     ],
   },

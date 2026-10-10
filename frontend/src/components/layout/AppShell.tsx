@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {flushSync} from 'react-dom';
 import {Link, NavLink, Outlet, useNavigate} from 'react-router';
-import {ChevronDown, LogOut, Menu, X} from 'lucide-react';
+import {ChevronDown, LogOut, Menu, Settings, X} from 'lucide-react';
 import {homePath, useAuth} from '../../auth/AuthContext';
 import {useTheme} from '../../theme/ThemeContext';
 import {PillButton} from '../PillButton';
@@ -124,6 +124,12 @@ export function AppShell() {
                     >
                       Dashboard
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings">
+                        <Settings aria-hidden /> Profile settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={handleLogout}>
                       <LogOut /> Log out
                     </DropdownMenuItem>
@@ -162,6 +168,22 @@ export function AppShell() {
             className="border-t bg-background px-4 pt-2 pb-4 md:hidden"
           >
             <ul className="flex flex-col gap-1">
+              {user && (
+                <li>
+                  <NavLink
+                    to="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className={({isActive}) =>
+                      cn(
+                        'flex items-center gap-2 rounded-lg px-3 py-2.5 font-medium',
+                        isActive ? 'bg-accent text-primary' : 'hover:bg-muted',
+                      )
+                    }
+                  >
+                    <Settings className="size-4" aria-hidden /> Profile settings
+                  </NavLink>
+                </li>
+              )}
               {links.map(l => (
                 <li key={l.to}>
                   <NavLink

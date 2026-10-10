@@ -13,6 +13,7 @@ import {BrowseProjects} from './pages/projects/BrowseProjects';
 import {ProjectDetail} from './pages/projects/ProjectDetail';
 import {StudentDashboard} from './pages/student/StudentDashboard';
 import {StudentOnboarding} from './pages/onboarding/StudentOnboarding';
+import {Settings} from './pages/settings/Settings';
 
 /** The app's routes; role-gated pages are wrapped in `RequireRole`. */
 export const router = createBrowserRouter([
@@ -22,6 +23,14 @@ export const router = createBrowserRouter([
       {index: true, element: <Landing />},
       {path: 'login', element: <Login />},
       {path: 'register', element: <Register />},
+      {
+        path: 'settings',
+        element: (
+          <RequireRole>
+            <Settings />
+          </RequireRole>
+        ),
+      },
       {
         path: 'onboarding/student',
         element: (

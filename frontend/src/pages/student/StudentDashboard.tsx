@@ -25,14 +25,9 @@ export function StudentDashboard() {
         title={`Welcome, ${user!.name.split(' ')[0]}`}
         description="Projects matched to your skills, and where your applications stand."
         actions={
-          <>
-            <Button variant="outline" asChild>
-              <Link to="/onboarding/student">Edit profile</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/projects">Browse projects</Link>
-            </Button>
-          </>
+          <Button asChild>
+            <Link to="/projects">Browse projects</Link>
+          </Button>
         }
       />
       <section aria-labelledby="recommended-heading" className="space-y-5">
@@ -92,7 +87,7 @@ function Recommendations() {
         description="Add skills to your profile so we can match you with projects, or browse everything that's open."
         action={
           <PillButton asChild size="sm">
-            <Link to="/onboarding/student">Add skills</Link>
+            <Link to="/settings">Add skills</Link>
           </PillButton>
         }
       />

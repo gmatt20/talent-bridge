@@ -6,16 +6,54 @@ file covers project structure, local setup, and the API contract.
 ## Structure
 
 - `frontend/` — React + TypeScript (Vite)
-- `backend/` — Pure Python (stdlib `http.server`, uv-managed)
+- `backend/` — Python + FastAPI (uv-managed), Postgres via either `psycopg`
+  (direct TCP) or the RDS Data API (`app/dataapi.py`) — see below.
 
 ## Running locally
 
 ### Backend
 
+There's a shared Aurora PostgreSQL cluster (`talent-bridge`) already
+provisioned on AWS. Two ways to reach it, controlled by `DB_MODE` in
+`backend/.env`:
+
+**`DB_MODE=data-api` (recommended)** — no VPC/SSH access needed at all, just
+signed HTTPS calls authenticated with your own AWS credentials:
+
 ```sh
+aws login --profile <your-profile>   # or however your team's CLI auth works
 cd backend
+cp .env.example .env   # fill in RDS_CLUSTER_ARN, RDS_SECRET_ARN, RDS_DATABASE, AWS_REGION
 uv sync
-uv run python -m app.main
+uv run python -m app.scripts.load_schema   # first time only, or after a schema change
+uv run python -m app.scripts.seed_skills   # first time only — loads the skills catalog
+uv run uvicorn app.main:app --env-file .env --reload
+```
+
+**`DB_MODE=psycopg`** — direct TCP, needs an SSH tunnel through the bastion
+(`tb-bastion`, security-group-restricted — ask whoever provisioned it for
+access or the `.pem` key) forwarding a local port to the Aurora endpoint:
+
+```sh
+ssh -i /path/to/tb-bastion-key.pem -N -L 5433:talent-bridge.cluster-ctsccqqmkzf0.us-west-2.rds.amazonaws.com:5432 ec2-user@<bastion-ip>
+# then, with DATABASE_URL in .env pointed at 127.0.0.1:5433
+uv run python -m app.scripts.load_schema
+uv run python -m app.scripts.seed_skills
+uv run uvicorn app.main:app --env-file .env --reload
+```
+
+**Fully local Postgres** (no AWS needed, e.g. for offline dev) — point
+`DATABASE_URL` at a local instance instead:
+
+```sh
+brew install postgresql@17
+brew services start postgresql@17
+createdb talent_bridge
+cd backend
+psql -d talent_bridge -f db/schema.sql
+# DB_MODE=psycopg, DATABASE_URL=postgresql:///talent_bridge in .env
+uv run python -m app.scripts.seed_skills
+uv run uvicorn app.main:app --env-file .env --reload
 ```
 
 ### Frontend
@@ -25,6 +63,10 @@ cd frontend
 npm install
 npm run dev
 ```
+
+Set `VITE_USE_MOCKS=false` in `frontend/.env` to point the frontend at the
+real backend (default is `true`, using the in-browser mock API).
+
 ## API Reference
 
 All endpoints require `Authorization: Bearer <token>` except `register` and `login`.
@@ -85,6 +127,23 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 { "id": 1, "companyName": "Habitat for Humanity OC", "description": "We build affordable housing across Orange County.", "website": "https://habitatoc.org", "totalProjectsPosted": 3 }
 ```
 
+**`PUT /api/organizations/me`** — Update own organization profile (organization only).
+
+```json
+// request
+{ "companyName": "Habitat for Humanity OC", "description": "We build affordable housing across Orange County.", "website": "https://habitatoc.org" }
+
+// response 200
+{ "id": 1, "companyName": "Habitat for Humanity OC", "description": "We build affordable housing across Orange County.", "website": "https://habitatoc.org", "totalProjectsPosted": 3 }
+```
+
+**`GET /api/organizations/me/projects`** — Own projects, any status (organization only).
+
+```json
+// response 200
+{ "items": [{ "id": 10, "title": "Volunteer Scheduling App", "status": "open", "organization": { "id": 1, "companyName": "Habitat for Humanity OC" }, "proposalCount": 2 }] }
+```
+
 ### Skills
 
 **`GET /api/skills?q=`** — Search skills for tagging.
@@ -135,6 +194,13 @@ All endpoints require `Authorization: Bearer <token>` except `register` and `log
 ```json
 // response 200
 { "items": [{ "project": { "id": 10, "title": "Volunteer Scheduling App", "organization": { "id": 1, "companyName": "Habitat for Humanity OC" } }, "matchScore": 0.86, "reasons": ["Matches your React and Python skills", "Aligns with your interest in community impact"] }] }
+```
+
+**`GET /api/students/me/proposals`** — Own applications, across all projects (student only).
+
+```json
+// response 200
+{ "items": [{ "id": 21, "coverLetter": "I've built similar booking flows...", "status": "pending", "createdAt": "2026-10-10T12:00:00Z", "project": { "id": 10, "title": "Volunteer Scheduling App" } }] }
 ```
 
 **`GET /api/projects/{id}/recommendations`** — Recommended students and mentors for a project (organization only).

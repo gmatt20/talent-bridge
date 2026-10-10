@@ -28,7 +28,9 @@ CREATE TABLE student_profiles (
     headline TEXT,
     bio TEXT,
     availability TEXT,
-    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5)
+    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
+    interests TEXT[] NOT NULL DEFAULT '{}',
+    learning_goals TEXT
 );
 
 CREATE TABLE mentor_profiles (

@@ -69,16 +69,24 @@ errors, run `aws login --profile AsherC` first.
 
 ## Open coordination items with Matthew
 
-1. **Skill resolver**: this module does fuzzy matching in Python. If you'd
-   rather use `pg_trgm.similarity()` in Postgres instead, pass the resolved
-   skills in and skip my `resolve_skills()` call. Either is fine.
-2. **`student_profiles` missing fields**: PLAN.md says to match on interests
-   and learning goals. Jeff's schema in PR #6 doesn't have those columns yet.
-   This module already accepts them as optional fields and falls back to `bio`.
-   Either add `interests TEXT[]` + `learning_goals TEXT` columns, or we
-   silently degrade to bio-only matching.
-3. **Brief persistence**: this module returns a Pydantic `Brief`. Writing to
-   `project_briefs`, `project_brief_skills`, and `milestones` tables is on
-   you. `brief.model_dump()` gives you a plain dict to work from.
-4. **No DB access from this module**: everything in/out is plain objects.
-   This stays true even if the model changes.
+1. ~~**Skill resolver**~~ — **Resolved**: using your `resolve_skills()` as-is
+   from `app/repo.py`/`analyze_project`. No `pg_trgm` duplication.
+2. ~~**`student_profiles` missing fields**~~ — **Resolved**: added
+   `interests TEXT[]` and `learning_goals TEXT` to `student_profiles` in
+   `db/schema.sql`. `app/repo.py#ai_student_profile` populates both on every
+   `StudentProfile` built for recommendations.
+3. ~~**Brief persistence**~~ — **Resolved**: `app/repo.py#persist_brief` writes
+   `project_briefs` + `project_brief_skills` + `milestones` in one transaction,
+   called from `POST /api/projects/{id}/analyze` in `app/routers/projects.py`.
+   `app/repo.py#brief_from_db` reads it back into an `ai.Brief` for
+   recommendations.
+4. **No DB access from this module**: still true — confirmed, nothing in
+   `app/routers/*` imports from `app.ai` except the pure functions in
+   `app/ai/__init__.py`.
+
+One more found while wiring this up: `bedrock.py#_get_client()`'s
+`boto3.client(...)` call wasn't inside the try/except, so a credentials or
+missing-dependency error (e.g. no `AsherC` profile configured) escaped as a
+raw 500 instead of falling back — fixed by wrapping client construction and
+raising `BedrockError` on failure, so the "never raises" contract holds for
+anyone running this without your AWS profile.

@@ -1,17 +1,26 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.exception_handlers import request_validation_exception_handler
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+"""The Talent Bridge API: app setup, routers and error responses.
 
-from .core.config import settings
-from .routers import auth, organizations, projects, skills, students
+Run locally with `uv run uvicorn app.main:app --reload`.
+"""
 
-app = FastAPI(title="Talent Bridge API")
+import fastapi
+from fastapi import exception_handlers
+from fastapi import exceptions
+from fastapi import responses
+from fastapi.middleware import cors
+
+from app.core import config
+from app.routers import auth
+from app.routers import organizations
+from app.routers import projects
+from app.routers import skills
+from app.routers import students
+
+app = fastapi.FastAPI(title="Talent Bridge API")
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    cors.CORSMiddleware,
+    allow_origins=config.settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,20 +33,34 @@ app.include_router(organizations.router)
 app.include_router(projects.router)
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_request: Request, exc: HTTPException) -> JSONResponse:
-    return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+@app.exception_handler(fastapi.HTTPException)
+async def http_exception_handler(
+    request: fastapi.Request, exc: fastapi.HTTPException
+) -> responses.JSONResponse:
+    """Returns HTTP errors as `{"error": message}`."""
+    del request  # Unused; required by the handler signature.
+    return responses.JSONResponse(
+        status_code=exc.status_code, content={"error": exc.detail}
+    )
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    first = exc.errors()[0] if exc.errors() else None
-    if first is None:
-        return await request_validation_exception_handler(request, exc)
-    field = ".".join(str(p) for p in first["loc"] if p != "body")
-    return JSONResponse(status_code=422, content={"error": f"{field}: {first['msg']}" if field else first["msg"]})
+@app.exception_handler(exceptions.RequestValidationError)
+async def validation_exception_handler(
+    request: fastapi.Request, exc: exceptions.RequestValidationError
+) -> responses.JSONResponse:
+    """Returns the first validation error as `{"error": "field: message"}`."""
+    errors = exc.errors()
+    if not errors:
+        return await exception_handlers.request_validation_exception_handler(
+            request, exc
+        )
+    first = errors[0]
+    field = ".".join(str(part) for part in first["loc"] if part != "body")
+    message = f"{field}: {first['msg']}" if field else first["msg"]
+    return responses.JSONResponse(status_code=422, content={"error": message})
 
 
 @app.get("/health")
 def health() -> dict[str, str]:
+    """Reports that the API is up."""
     return {"status": "ok"}

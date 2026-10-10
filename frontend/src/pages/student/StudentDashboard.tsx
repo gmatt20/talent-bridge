@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import {Link} from 'react-router';
-import {FileText, Sparkles} from 'lucide-react';
+import {FileText, RefreshCw, Sparkles} from 'lucide-react';
 import * as api from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {EmptyState} from '../../components/EmptyState';
@@ -12,8 +12,9 @@ import {MatchCardSkeleton} from '../../components/recommendations/MatchCardSkele
 import {RecommendationCard} from '../../components/recommendations/RecommendationCard';
 import {Button} from '../../components/ui/button';
 import {Skeleton} from '../../components/ui/skeleton';
-import {useApi} from '../../hooks/useApi';
+import {useApi, type ApiState} from '../../hooks/useApi';
 import {formatDate} from '../../lib/format';
+import type {Paginated, StudentRecommendation} from '../../types/api';
 
 /** The student's home: AI-recommended projects and their applications. */
 export function StudentDashboard() {
@@ -31,12 +32,6 @@ export function StudentDashboard() {
         }
       />
       <section aria-labelledby="recommended-heading" className="space-y-5">
-        <h2
-          id="recommended-heading"
-          className="font-display text-xl font-extrabold"
-        >
-          Recommended for you
-        </h2>
         <Recommendations />
       </section>
       <section aria-labelledby="applications-heading" className="space-y-5">
@@ -54,6 +49,37 @@ export function StudentDashboard() {
 
 function Recommendations() {
   const recs = useApi(() => api.students.recommendations(), []);
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2
+          id="recommended-heading"
+          className="font-display text-xl font-extrabold"
+        >
+          Recommended for you
+        </h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={recs.reload}
+          disabled={recs.loading}
+          aria-label="Refresh recommendations"
+        >
+          <RefreshCw className="size-4" aria-hidden />
+          {recs.loading ? 'Loading…' : 'Refresh'}
+        </Button>
+      </div>
+      <RecommendationResults recs={recs} />
+    </>
+  );
+}
+
+interface RecommendationResultsProps {
+  recs: ApiState<Paginated<StudentRecommendation>>;
+}
+
+function RecommendationResults({recs}: RecommendationResultsProps) {
 
   if (recs.loading && !recs.data) {
     return (

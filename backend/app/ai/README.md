@@ -39,7 +39,7 @@ proj_recs = recommend_projects_for_student(me, pairs, top_n=10)
 
 | | |
 |---|---|
-| Model | DeepSeek R1 via Bedrock inference profile `us.deepseek.r1-v1:0` in `us-west-2`. Swap with `BEDROCK_MODEL_ID` env var. |
+| Model | Amazon Nova Lite (`amazon.nova-lite-v1:0`) in `us-west-2`. Regional model, no cross-region routing. Swap with `BEDROCK_MODEL_ID` env var. |
 | Scoring | **Hybrid**: deterministic skill overlap + availability + rating → numeric score. Bedrock generates `reasons[]` text only, never the score. |
 | Skill resolution | AI returns skill names; `resolve_skills()` fuzzy-matches to the catalog using `difflib`. Unknown names dropped silently. |
 | Failure mode | Every Bedrock call has a deterministic fallback. The module never raises — handlers always get a valid Brief/Recommendation. |

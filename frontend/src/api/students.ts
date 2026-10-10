@@ -15,7 +15,7 @@ export const updateMe = (body: UpdateStudentProfileRequest) =>
 export const recommendations = () =>
   request<Paginated<StudentRecommendation>>('GET', '/api/students/me/recommendations')
 
-// Proposed endpoint, not yet in the README contract.
+// Proposed endpoint, not yet in the ARCHITECTURE.md contract.
 export const myProposals = () =>
   request<Paginated<Proposal & { project: { id: number; title: string } }>>(
     'GET',

@@ -1,0 +1,12 @@
+[project]
+name = "talent-bridge-backend"
+version = "0.1.0"
+description = "Talent Bridge backend API"
+authors = [
+    { name = "Matthew Garcia", email = "gmatt.devs@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false

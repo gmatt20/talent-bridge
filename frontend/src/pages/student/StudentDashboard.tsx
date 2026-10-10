@@ -71,10 +71,10 @@ function Recommendations() {
           <Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
           Matching projects to your skills…
         </p>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="space-y-4">
           {[0, 1, 2].map(i => (
             <li key={i}>
-              <MatchCardSkeleton />
+              <MatchCardSkeleton orientation="row" />
             </li>
           ))}
         </ul>
@@ -99,10 +99,10 @@ function Recommendations() {
     );
   }
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="space-y-4">
       {recs.data!.items.map(rec => (
         <li key={rec.project.id}>
-          <RecommendationCard recommendation={rec} />
+          <RecommendationCard recommendation={rec} orientation="row" />
         </li>
       ))}
     </ul>

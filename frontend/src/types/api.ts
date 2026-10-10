@@ -22,14 +22,14 @@ export interface AuthResponse {
 export interface RegisterRequest {
   role: Role;
   email: string;
-  password: string;
+  password_hash: string;
   name: string;
 }
 
 /** Body of `POST /api/auth/login`. */
 export interface LoginRequest {
   email: string;
-  password: string;
+  password_hash: string;
 }
 
 /** A skill from the shared catalog, used to tag students and projects. */

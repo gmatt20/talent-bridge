@@ -29,13 +29,13 @@ class AuthResponse(BaseModel):
 class RegisterRequest(BaseModel):
     role: str
     email: str
-    password: str
+    password_hash: str
     name: str
 
 
 class LoginRequest(BaseModel):
     email: str
-    password: str
+    password_hash: str
 
 
 class StudentSummary(BaseModel):

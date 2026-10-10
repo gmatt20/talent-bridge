@@ -32,7 +32,7 @@ export function Login() {
     setError(undefined);
     setPending(true);
     try {
-      const u = await login({email: email.trim(), password});
+      const u = await login({email: email.trim(), password_hash: password});
       navigate(from ?? homePath(u.role), {replace: true});
     } catch (err) {
       setError(errorMessage(err));

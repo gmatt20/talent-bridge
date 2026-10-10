@@ -142,6 +142,7 @@ def my_proposals(user: deps.Student, db: deps.Db) -> dict[str, Any]:
         "WHERE pr.student_id = %s ORDER BY pr.created_at DESC",
         (user["id"],),
     ).fetchall()
+    profile = _student_profile_out(db, user["id"])
     items = [
         {
             "id": r["id"],
@@ -149,11 +150,11 @@ def my_proposals(user: deps.Student, db: deps.Db) -> dict[str, Any]:
             "status": r["status"],
             "createdAt": repo.to_iso(r["created_at"]),
             "student": {
-                "id": user["id"],
-                "name": user["name"],
-                "headline": None,
-                "rating": None,
-                "skills": [],
+                "id": profile["id"],
+                "name": profile["name"],
+                "headline": profile["headline"],
+                "rating": profile["rating"],
+                "skills": profile["skills"],
             },
             "project": {"id": r["project_id"], "title": r["project_title"]},
         }

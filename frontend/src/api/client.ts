@@ -5,6 +5,11 @@ export {ApiError};
 const TOKEN_KEY = 'tb.token';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
+// Absolute backend origin (e.g. the deployed API). When empty, requests use
+// relative paths and rely on the Vite dev proxy. Trailing slash is trimmed so
+// `${API_BASE}${path}` never produces a double slash.
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+
 /** Returns the stored session token, or null when signed out. */
 export function getToken(): string | null {
   try {
@@ -50,7 +55,7 @@ export async function request<T>(
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,

@@ -3,7 +3,7 @@ import { request } from './client'
 
 export const get = (id: number) => request<Organization>('GET', `/api/organizations/${id}`)
 
-// Proposed endpoints, not yet in the README contract.
+// Proposed endpoints, not yet in the ARCHITECTURE.md contract.
 export const updateMe = (body: Pick<Organization, 'companyName' | 'description' | 'website'>) =>
   request<Organization>('PUT', '/api/organizations/me', body)
 

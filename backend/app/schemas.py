@@ -54,7 +54,8 @@ class RegisterRequest(CamelModel):
 
     role: str
     email: str
-    password_hash: str
+    # The contract keeps this key snake_case. It holds the plaintext password.
+    password_hash: str = pydantic.Field(alias="password_hash")
     name: str
 
 
@@ -62,7 +63,8 @@ class LoginRequest(CamelModel):
     """Body of `POST /api/auth/login`."""
 
     email: str
-    password_hash: str
+    # The contract keeps this key snake_case. It holds the plaintext password.
+    password_hash: str = pydantic.Field(alias="password_hash")
 
 
 class StudentSummary(CamelModel):

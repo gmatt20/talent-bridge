@@ -68,10 +68,10 @@ function ProjectBody({ project, onChange }: { project: Project; onChange: () => 
     <>
       <header>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{project.title}</h1>
+          <h1 className="font-display text-[28px] leading-[1.05] font-extrabold text-balance sm:text-[34px]">{project.title}</h1>
           <ProjectStatusBadge status={project.status} />
         </div>
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
+        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[13px] text-muted-foreground tabular-nums">
           {project.category && (
             <span className="flex items-center gap-1.5">
               <Tag className="size-4" aria-hidden /> {project.category}
@@ -85,8 +85,8 @@ function ProjectBody({ project, onChange }: { project: Project; onChange: () => 
         </div>
       </header>
 
-      <section aria-labelledby="description-heading" className="rounded-xl border bg-card p-5 sm:p-6">
-        <h2 id="description-heading" className="text-sm font-semibold">
+      <section aria-labelledby="description-heading" className="rounded-2xl border bg-card p-5 sm:p-6">
+        <h2 id="description-heading" className="eyebrow text-primary">
           Your description
         </h2>
         <p className="mt-2 whitespace-pre-line text-muted-foreground">{project.description}</p>

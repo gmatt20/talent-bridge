@@ -1,15 +1,25 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-heading: var(--font-sans);
-    --font-sans: 'Inter Variable', system-ui, sans-serif;
-    --color-periwinkle: var(--cif-periwinkle);
-    --color-lavender: var(--cif-lavender);
+    --font-sans: 'Instrument Sans Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --color-coal: var(--tb-coal);
+    --color-indigo: var(--tb-indigo);
+    --color-periwinkle: var(--tb-periwinkle);
+    --color-lavender: var(--tb-lavender);
+    --color-flare: var(--tb-flare);
+    --color-line-strong: var(--line-strong);
+    --color-success: var(--success);
+    --color-success-surface: var(--success-surface);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -41,55 +51,133 @@
     --color-card: var(--card);
     --color-foreground: var(--foreground);
     --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+    --shadow-hard: 4px 4px 0 0 var(--hard-shadow);
+    --shadow-hard-sm: 2px 2px 0 0 var(--hard-shadow);
+    /* Design system radii: sm inputs, md menus, lg cards, pill CTAs. */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 8px;
+    --radius-xl: 14px;
+    --radius-2xl: 22px;
+    --radius-3xl: 28px;
+    --radius-4xl: 36px;
 }
 
-/* Brand tokens from cifdn.org :root (ink, primary, primary-text, accent, background) */
+/* Talent Bridge design system (claude.ai/artifact/JpP9dbkgE1FcQy26i1xhrG).
+   CIF's indigo, periwinkle and lavender, plus flare for one hot spot per screen. */
 :root {
-    --cif-ink: #0b0b0f;
-    --cif-periwinkle: #7b8cff;
-    --cif-indigo: #4453d6;
-    --cif-lavender: #e9e6ff;
-    --cif-paper: #faf9f6;
+    --tb-coal: #0b0b0f;
+    --tb-indigo: #4453d6;
+    --tb-periwinkle: #7b8cff;
+    --tb-lavender: #e9e6ff;
+    --tb-flare: #ff6a3d;
 
-    --background: var(--cif-paper);
-    --foreground: var(--cif-ink);
+    --background: #f6f5fb;
+    --foreground: #0b0b0f;
     --card: #ffffff;
-    --card-foreground: var(--cif-ink);
+    --card-foreground: #0b0b0f;
     --popover: #ffffff;
-    --popover-foreground: var(--cif-ink);
-    --primary: var(--cif-indigo);
+    --popover-foreground: #0b0b0f;
+    --primary: var(--tb-indigo);
     --primary-foreground: #ffffff;
-    --secondary: #f3f4f6;
-    --secondary-foreground: var(--cif-ink);
-    --muted: #f3f4f6;
-    --muted-foreground: #6a7282;
-    --accent: var(--cif-lavender);
-    --accent-foreground: var(--cif-indigo);
-    --destructive: #e40014;
-    --border: #e5e7eb;
-    --input: #d1d5dc;
-    --ring: var(--cif-periwinkle);
-    --chart-1: var(--cif-periwinkle);
-    --chart-2: var(--cif-indigo);
-    --chart-3: #00a544;
-    --chart-4: #b75000;
-    --chart-5: #6a7282;
-    --radius: 0.75rem;
+    --secondary: #eeedf6;
+    --secondary-foreground: #0b0b0f;
+    --muted: #eeedf6;
+    --muted-foreground: #5e5c78;
+    --accent: var(--tb-lavender);
+    --accent-foreground: var(--tb-indigo);
+    --destructive: #c8202f;
+    --success: #0e7050;
+    --success-surface: #e3f4ec;
+    --border: #dcdae9;
+    --line-strong: #0b0b0f;
+    --input: #0b0b0f;
+    --ring: var(--tb-indigo);
+    --hard-shadow: #0b0b0f;
+    --chart-1: var(--tb-periwinkle);
+    --chart-2: var(--tb-indigo);
+    --chart-3: var(--tb-flare);
+    --chart-4: #0e7050;
+    --chart-5: #5e5c78;
+    --radius: 8px;
     --sidebar: #ffffff;
-    --sidebar-foreground: var(--cif-ink);
-    --sidebar-primary: var(--cif-indigo);
+    --sidebar-foreground: #0b0b0f;
+    --sidebar-primary: var(--tb-indigo);
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: var(--cif-lavender);
-    --sidebar-accent-foreground: var(--cif-indigo);
-    --sidebar-border: #e5e7eb;
-    --sidebar-ring: var(--cif-periwinkle);
+    --sidebar-accent: var(--tb-lavender);
+    --sidebar-accent-foreground: var(--tb-indigo);
+    --sidebar-border: #dcdae9;
+    --sidebar-ring: var(--tb-indigo);
+}
+
+.dark {
+    --background: #0f0f17;
+    --foreground: #f2f1fa;
+    --card: #181826;
+    --card-foreground: #f2f1fa;
+    --popover: #181826;
+    --popover-foreground: #f2f1fa;
+    --primary: var(--tb-periwinkle);
+    --primary-foreground: var(--tb-coal);
+    --secondary: #1f1f30;
+    --secondary-foreground: #f2f1fa;
+    --muted: #1f1f30;
+    --muted-foreground: #a5a3c2;
+    --accent: #262650;
+    --accent-foreground: var(--tb-periwinkle);
+    --destructive: #ff7a7f;
+    --success: #4cc38a;
+    --success-surface: #123123;
+    --border: #2e2e48;
+    --line-strong: #64649a;
+    --input: #64649a;
+    --ring: var(--tb-periwinkle);
+    --hard-shadow: var(--tb-periwinkle);
+    --sidebar: #181826;
+    --sidebar-foreground: #f2f1fa;
+    --sidebar-primary: var(--tb-periwinkle);
+    --sidebar-primary-foreground: var(--tb-coal);
+    --sidebar-accent: #262650;
+    --sidebar-accent-foreground: var(--tb-periwinkle);
+    --sidebar-border: #2e2e48;
+    --sidebar-ring: var(--tb-periwinkle);
+}
+
+/* Headlines: Archivo, always set expanded. */
+@utility font-display {
+    font-family: 'Archivo Variable', 'Arial Black', system-ui, sans-serif;
+    font-stretch: 125%;
+}
+
+/* Uppercase mono label above titles. */
+@utility eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Hover lift onto the hard shadow; press drops to the small one. */
+@utility lift {
+    transition-property: translate, box-shadow;
+    transition-duration: 120ms;
+    transition-timing-function: ease;
+    &:hover {
+        translate: -2px -2px;
+        box-shadow: var(--shadow-hard);
+    }
+    &:active {
+        translate: 0 0;
+        box-shadow: var(--shadow-hard-sm);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+        &:hover {
+            translate: none;
+        }
+    }
 }
 
 @layer base {

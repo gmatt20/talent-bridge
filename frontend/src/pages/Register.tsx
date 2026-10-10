@@ -93,7 +93,7 @@ export default function Register() {
         <FormError message={error} />
 
         <div className="space-y-2">
-          <p id="role-label" className="text-sm font-medium">
+          <p id="role-label" className="text-sm font-semibold">
             I’m joining as
           </p>
           <div
@@ -114,8 +114,8 @@ export default function Register() {
                   tabIndex={checked || (!role && i === 0) ? 0 : -1}
                   onClick={() => setRole(value)}
                   className={cn(
-                    'relative flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                    checked ? 'border-primary bg-accent/50' : 'hover:border-primary/40 hover:bg-accent/20',
+                    'relative flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ring',
+                    checked ? 'border-line-strong bg-accent shadow-hard' : 'border-border hover:border-line-strong',
                   )}
                 >
                   <span className="flex size-10 items-center justify-center rounded-full bg-accent text-primary">

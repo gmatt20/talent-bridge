@@ -33,11 +33,11 @@ export default function Landing() {
   return (
     <>
       <section className="mx-auto max-w-6xl px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
-        <p className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-sm font-medium text-primary">
-          <Sparkles className="size-4" aria-hidden />
+        <p className="eyebrow inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-accent-foreground">
+          <Sparkles className="size-3.5" aria-hidden />
           Community-powered, AI-assisted
         </p>
-        <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
+        <h1 className="font-display mt-6 max-w-4xl text-[44px] leading-[0.95] font-black tracking-[-0.01em] text-balance sm:text-[72px]">
           Local challenges, meet local talent.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-muted-foreground text-pretty">
@@ -45,7 +45,7 @@ export default function Landing() {
           problems, so good ideas don't stall for lack of hands.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <PillButton asChild>
+          <PillButton asChild tone="flare">
             <Link to="/register?role=organization">I'm a business or nonprofit</Link>
           </PillButton>
           <PillButton asChild tone="outline">
@@ -54,21 +54,21 @@ export default function Landing() {
         </div>
       </section>
 
-      <section aria-labelledby="how-heading" className="border-y bg-card">
+      <section aria-labelledby="how-heading" className="border-y-2 border-line-strong bg-card">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 id="how-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 id="how-heading" className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]">
             How it works
           </h2>
           <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <li key={title} className="rounded-2xl border bg-background p-5">
+              <li key={title} className="rounded-2xl border-2 border-line-strong bg-background p-5">
                 <div className="flex items-center justify-between">
-                  <span className="flex size-10 items-center justify-center rounded-full bg-accent text-primary">
+                  <span className="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden />
                   </span>
-                  <span className="text-sm font-medium text-muted-foreground">Step {i + 1}</span>
+                  <span className="eyebrow text-muted-foreground">Step {i + 1}</span>
                 </div>
-                <h3 className="mt-4 font-semibold">{title}</h3>
+                <h3 className="mt-4 text-lg font-semibold">{title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{body}</p>
               </li>
             ))}
@@ -77,19 +77,30 @@ export default function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="flex flex-col gap-6 rounded-3xl bg-primary p-8 text-primary-foreground sm:p-12 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">AI recommends. People decide.</h2>
+        <div className="relative flex flex-col gap-6 overflow-hidden rounded-3xl bg-primary p-8 pb-16 text-primary-foreground sm:p-12 sm:pb-20 md:flex-row md:items-center md:justify-between">
+          <BridgeArches />
+          <div className="relative max-w-xl">
+            <h2 className="font-display text-[28px] leading-[1.05] font-extrabold sm:text-[34px]">AI recommends. People decide.</h2>
             <p className="mt-2 text-primary-foreground/80">
               Our AI helps with the busywork of writing briefs and finding good fits. Every decision about who
               works on what stays with you.
             </p>
           </div>
-          <PillButton asChild tone="outline" className="self-start border-transparent md:self-auto">
+          <PillButton asChild tone="outline" className="relative self-start md:self-auto">
             <Link to="/projects">Browse open projects</Link>
           </PillButton>
         </div>
       </section>
     </>
+  )
+}
+
+// The brand motif: half-circle spans cut along the bottom edge, like a viaduct.
+function BridgeArches() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-[radial-gradient(circle_at_50%_100%,var(--background)_26px,transparent_27px)] bg-[length:72px_32px] bg-bottom bg-repeat-x"
+    />
   )
 }

@@ -7,14 +7,14 @@ import type { ProjectBrief } from '@/types/api'
 // The AI-structured brief. Labeled as a suggestion: AI recommends, people decide.
 export function BriefView({ brief, actions }: { brief: ProjectBrief; actions?: ReactNode }) {
   return (
-    <section aria-labelledby="brief-heading" className="rounded-xl border bg-card">
+    <section aria-labelledby="brief-heading" className="rounded-2xl border-2 border-line-strong bg-card">
       <div className="flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-flare text-coal">
             <Sparkles className="size-4.5" aria-hidden />
           </span>
           <div>
-            <h2 id="brief-heading" className="font-semibold">
+            <h2 id="brief-heading" className="font-display text-lg font-extrabold">
               Project brief
             </h2>
             <p className="text-sm text-muted-foreground">Suggested by AI from your description. You decide what fits.</p>
@@ -61,13 +61,13 @@ export function BriefView({ brief, actions }: { brief: ProjectBrief; actions?: R
                 )}
                 <span
                   aria-hidden
-                  className="relative mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-card text-[10px] font-semibold text-primary"
+                  className="relative mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-[10px] font-semibold text-primary-foreground"
                 >
                   {i + 1}
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">{m.title}</p>
-                  {m.dueDate && <p className="text-sm text-muted-foreground">Due {formatDate(m.dueDate)}</p>}
+                  {m.dueDate && <p className="font-mono text-[13px] text-muted-foreground tabular-nums">Due {formatDate(m.dueDate)}</p>}
                 </div>
               </li>
             ))}
@@ -97,14 +97,14 @@ function BriefList({ title, icon, items }: { title: string; icon: ReactNode; ite
 // Shown while the AI is turning the description into a brief.
 export function AnalyzingState() {
   return (
-    <div role="status" aria-live="polite" className="flex flex-col items-center rounded-xl border bg-card px-6 py-14 text-center">
+    <div role="status" aria-live="polite" className="flex flex-col items-center rounded-2xl border bg-card px-6 py-14 text-center">
       <span className="relative flex size-14 items-center justify-center">
-        <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-accent motion-reduce:hidden" />
-        <span className="relative flex size-14 items-center justify-center rounded-full bg-accent text-primary">
+        <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-flare/40 motion-reduce:hidden" />
+        <span className="relative flex size-14 items-center justify-center rounded-full bg-flare text-coal">
           <Sparkles className="size-6 animate-pulse motion-reduce:animate-none" aria-hidden />
         </span>
       </span>
-      <h2 className="mt-5 text-lg font-semibold">AI is structuring your challenge…</h2>
+      <h2 className="font-display mt-5 text-xl font-extrabold">AI is structuring your challenge…</h2>
       <p className="mt-1 max-w-sm text-muted-foreground text-pretty">
         We’re turning your description into objectives, deliverables, skills and milestones. This takes a few seconds.
       </p>

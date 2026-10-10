@@ -91,7 +91,7 @@ export default function NewProject() {
         />
       </div>
 
-      <form onSubmit={onSubmit} noValidate className="space-y-6 rounded-xl border bg-card p-5 sm:p-8">
+      <form onSubmit={onSubmit} noValidate className="space-y-6 rounded-2xl border bg-card p-5 sm:p-8">
         <FormError message={error} />
 
         <div className="space-y-2">
@@ -109,11 +109,11 @@ export default function NewProject() {
 
         <div className="space-y-2">
           <Label htmlFor="description">What do you need help with?</Label>
-          <div className="rounded-lg bg-accent/50 p-3 text-sm">
+          <div className="rounded-xl bg-accent p-3 text-sm">
             <p className="flex items-center gap-2 font-medium text-primary">
               <Lightbulb className="size-4" aria-hidden /> Helpful things to mention
             </p>
-            <ul className="mt-1.5 list-disc space-y-0.5 pl-6 text-muted-foreground">
+            <ul className="mt-1.5 list-disc space-y-0.5 pl-6 text-accent-foreground">
               {PROMPTS.map((p) => (
                 <li key={p}>{p}</li>
               ))}

@@ -54,7 +54,7 @@ class RegisterRequest(CamelModel):
 
     role: str
     email: str
-    password: str
+    password_hash: str
     name: str
 
 
@@ -62,7 +62,7 @@ class LoginRequest(CamelModel):
     """Body of `POST /api/auth/login`."""
 
     email: str
-    password: str
+    password_hash: str
 
 
 class StudentSummary(CamelModel):

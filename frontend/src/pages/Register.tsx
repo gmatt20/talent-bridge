@@ -56,7 +56,7 @@ export default function Register() {
     setError(undefined)
     setPending(true)
     try {
-      await register({ role, name: name.trim(), email: email.trim(), password })
+      await register({ role, name: name.trim(), email: email.trim(), password_hash: password })
       navigate(ONBOARDING[role], { replace: true })
     } catch (err) {
       setError((err as Error).message)

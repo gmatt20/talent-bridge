@@ -1,6 +1,8 @@
 """Registration, login and the current user."""
 
-from typing import Any
+import re
+import psycopg
+from fastapi import APIRouter, Depends, HTTPException
 
 import fastapi
 
@@ -11,7 +13,8 @@ from app.core import security
 
 router = fastapi.APIRouter()
 
-VALID_ROLES = frozenset({"organization", "student", "mentor"})
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
 
 
 def _user_out(row: dict[str, Any]) -> dict[str, Any]:
@@ -36,13 +39,11 @@ def register(body: schemas.RegisterRequest, db: deps.Db) -> dict[str, Any]:
     if not name:
         raise fastapi.HTTPException(status_code=400, detail="Name is required.")
     if not email:
-        raise fastapi.HTTPException(
-            status_code=400, detail="Email is required."
-        )
-    if len(body.password) < 8:
-        raise fastapi.HTTPException(
-            status_code=400, detail="Password must be at least 8 characters."
-        )
+        raise HTTPException(400, "Email is required.")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(400, "Please enter a valid email address.")
+    if len(body.password_hash) < 8:
+        raise HTTPException(400, "Password must be at least 8 characters.")
 
     existing = db.execute(
         "SELECT 1 FROM users WHERE email = %s", (email,)
@@ -53,11 +54,15 @@ def register(body: schemas.RegisterRequest, db: deps.Db) -> dict[str, Any]:
             detail="An account with this email already exists.",
         )
 
+    existing = db.execute("SELECT 1 FROM users WHERE LOWER(name) = LOWER(%s)", (name,)).fetchone()
+    if existing:
+        raise HTTPException(409, "An account with this name already exists.")
+
     row = db.execute(
         "INSERT INTO users (role, email, password_hash, name) "
         "VALUES (%s, %s, %s, %s) "
         "RETURNING id, role, email::text, name, created_at",
-        (body.role, email, security.hash_password(body.password), name),
+        (body.role, email, hash_password(body.password_hash), name),
     ).fetchone()
 
     if body.role == "organization":
@@ -87,16 +92,11 @@ def login(body: schemas.LoginRequest, db: deps.Db) -> dict[str, Any]:
         "FROM users WHERE email = %s",
         (email,),
     ).fetchone()
-    if not row or not security.verify_password(
-        body.password, row["password_hash"]
-    ):
-        raise fastapi.HTTPException(
-            status_code=401, detail="Invalid email or password."
-        )
-    return {"token": security.create_token(row["id"]), "user": _user_out(row)}
+    if not row or not verify_password(body.password_hash, row["password_hash"]):
+        raise HTTPException(401, "Invalid email or password.")
+    return {"token": create_token(row["id"]), "user": _user_out(row)}
 
 
-@router.get("/api/users/me", response_model=schemas.UserOut)
-def me(user: deps.CurrentUser) -> dict[str, Any]:
-    """Returns the signed-in user."""
+@router.get("/api/users/me", response_model=s.UserOut)
+def me(user: dict = Depends(get_current_user)):
     return _user_out(user)

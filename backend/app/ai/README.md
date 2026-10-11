@@ -55,7 +55,7 @@ Environment variables (see `backend/.env.example`):
 - `AWS_PROFILE` — AWS SSO profile with Bedrock access
 - `AWS_REGION` — defaults to `us-west-2`
 - `BEDROCK_MODEL_ID` — defaults to `us.deepseek.r1-v1:0`
-- `BEDROCK_TEMPERATURE` — defaults to `0.2`
+- `BEDROCK_TEMPERATURE` — defaults to `0.00001` (near-greedy, repeatable)
 
 ## Running
 

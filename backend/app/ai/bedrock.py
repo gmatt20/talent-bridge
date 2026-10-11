@@ -18,7 +18,8 @@ log = logging.getLogger(__name__)
 # BEDROCK_MODEL_ID.
 DEFAULT_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
 DEFAULT_REGION = os.getenv("AWS_REGION", "us-west-2")
-DEFAULT_TEMPERATURE = float(os.getenv("BEDROCK_TEMPERATURE", "0.2"))
+# Nova rejects temperature 0; 0.00001 is its minimum and effectively greedy.
+DEFAULT_TEMPERATURE = float(os.getenv("BEDROCK_TEMPERATURE", "0.00001"))
 MAX_RETRIES = 2
 
 _FENCE_RE = re.compile(r"```(?:json)?\s*(.+?)\s*```", re.DOTALL)
@@ -77,6 +78,9 @@ def invoke_json(
                     "maxTokens": max_tokens,
                     "temperature": DEFAULT_TEMPERATURE,
                 },
+                # topK is Nova-specific and only accepted via
+                # additionalModelRequestFields; 1 forces greedy decoding.
+                additionalModelRequestFields={"inferenceConfig": {"topK": 1}},
             )
             text = resp["output"]["message"]["content"][0]["text"]
             return _parse_json(text)

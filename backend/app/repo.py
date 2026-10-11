@@ -5,6 +5,7 @@ things the AI module leaves to the HTTP layer) in one place instead of
 scattered across routers.
 """
 
+import datetime
 from typing import Any
 
 from psycopg.types import json as psycopg_json
@@ -14,13 +15,25 @@ from app.ai import schemas as ai_schemas
 
 
 def to_iso(value: object) -> str | None:
-    """Returns a timestamp column as an ISO string.
+    """Returns a timestamp column as an ISO 8601 string.
 
-    psycopg returns datetime objects; the Data API returns pre-formatted
-    strings. Both are normalized for the JSON response.
+    psycopg returns `datetime` objects, while the Data API returns strings
+    like "2026-10-10 21:38:12.150607" with no timezone. Both are normalized
+    to the same ISO 8601 form so the wire format does not depend on
+    `DB_MODE`. Naive values are read as UTC, which is what the Data API
+    returns for the `timestamptz` columns in this schema.
     """
     if value is None:
         return None
+    if isinstance(value, str):
+        try:
+            value = datetime.datetime.fromisoformat(value)
+        except ValueError:
+            return value
+    if isinstance(value, datetime.datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=datetime.timezone.utc)
+        return value.isoformat()
     if hasattr(value, "isoformat"):
         return value.isoformat()
     return str(value)

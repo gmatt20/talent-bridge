@@ -128,11 +128,11 @@ def create_project(
     if deadline:
         try:
             datetime.strptime(deadline, "%Y-%m-%d")
-        except ValueError:
+        except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=400,
                 detail="Please use a valid date in YYYY-MM-DD format.",
-            )
+            ) from exc
     row = db.execute(
         "INSERT INTO projects "
         "(organization_id, title, description, deadline, category) "

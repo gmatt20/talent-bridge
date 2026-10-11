@@ -20,6 +20,7 @@ import {BriefView} from '../../components/project/BriefView';
 import {ProjectStatusBadge} from '../../components/project/ProjectStatusBadge';
 import {ApplicationCard} from '../../components/proposals/ApplicationCard';
 import {ProposalStatusBadge} from '../../components/proposals/ProposalStatusBadge';
+import {MatchCardSkeleton} from '../../components/recommendations/MatchCardSkeleton';
 import {PersonMatchCard} from '../../components/recommendations/PersonMatchCard';
 import {TeamCard} from '../../components/team/TeamCard';
 import {PillButton} from '../../components/PillButton';
@@ -312,14 +313,17 @@ function RecommendationList({project, proposals}: RecommendedStudentsProps) {
   if (recs.loading && !recs.data) {
     return (
       <div className="space-y-4" role="status" aria-label="Finding students">
-        <p className="text-sm text-muted-foreground">
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
           Matching students to your brief…
         </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {[0, 1].map(i => (
-            <Skeleton key={i} className="h-64 rounded-2xl" />
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {[0, 1, 2, 3].map(i => (
+            <li key={i}>
+              <MatchCardSkeleton />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {flushSync} from 'react-dom';
-import {Link, NavLink, Outlet, useNavigate} from 'react-router';
-import {ChevronDown, LogOut, Menu, X} from 'lucide-react';
+import {Link, NavLink, Outlet, useLocation, useNavigate} from 'react-router';
+import {ChevronDown, LogOut, Menu, Settings, X} from 'lucide-react';
 import {homePath, useAuth} from '../../auth/AuthContext';
 import {useTheme} from '../../theme/ThemeContext';
 import {PillButton} from '../PillButton';
@@ -49,6 +49,7 @@ const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 /** The page frame: header with role-aware navigation, the routed page, footer. */
 export function AppShell() {
   const {user} = useAuth();
+  const isLanding = useLocation().pathname === '/';
   const navigate = useNavigate();
   const signOut = useSignOut();
   const {resolvedTheme} = useTheme();
@@ -77,11 +78,16 @@ export function AppShell() {
 
       <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="flex items-center gap-6">
+          <div
+            className={cn('flex items-center gap-6', isLanding && 'flex-1')}
+          >
             <Logo />
             <nav
               aria-label="Main"
-              className="hidden items-center gap-1 md:flex"
+              className={cn(
+                'hidden items-center gap-1 md:flex',
+                isLanding && 'ml-auto',
+              )}
             >
               {links.map(l => (
                 <NavLink key={l.to} to={l.to} end className={navLinkClass}>
@@ -124,6 +130,12 @@ export function AppShell() {
                     >
                       Dashboard
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings">
+                        <Settings aria-hidden /> Profile settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={handleLogout}>
                       <LogOut /> Log out
                     </DropdownMenuItem>
@@ -162,6 +174,22 @@ export function AppShell() {
             className="border-t bg-background px-4 pt-2 pb-4 md:hidden"
           >
             <ul className="flex flex-col gap-1">
+              {user && (
+                <li>
+                  <NavLink
+                    to="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className={({isActive}) =>
+                      cn(
+                        'flex items-center gap-2 rounded-lg px-3 py-2.5 font-medium',
+                        isActive ? 'bg-accent text-primary' : 'hover:bg-muted',
+                      )
+                    }
+                  >
+                    <Settings className="size-4" aria-hidden /> Profile settings
+                  </NavLink>
+                </li>
+              )}
               {links.map(l => (
                 <li key={l.to}>
                   <NavLink

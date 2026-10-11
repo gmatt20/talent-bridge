@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import {Link} from 'react-router';
-import {FileText, Sparkles} from 'lucide-react';
+import {FileText, RefreshCw, Sparkles} from 'lucide-react';
 import * as api from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {EmptyState} from '../../components/EmptyState';
@@ -8,11 +8,13 @@ import {ErrorState} from '../../components/ErrorState';
 import {PageHeader} from '../../components/PageHeader';
 import {PillButton} from '../../components/PillButton';
 import {ProposalStatusBadge} from '../../components/proposals/ProposalStatusBadge';
+import {MatchCardSkeleton} from '../../components/recommendations/MatchCardSkeleton';
 import {RecommendationCard} from '../../components/recommendations/RecommendationCard';
 import {Button} from '../../components/ui/button';
 import {Skeleton} from '../../components/ui/skeleton';
-import {useApi} from '../../hooks/useApi';
+import {useApi, type ApiState} from '../../hooks/useApi';
 import {formatDate} from '../../lib/format';
+import type {Paginated, StudentRecommendation} from '../../types/api';
 
 /** The student's home: AI-recommended projects and their applications. */
 export function StudentDashboard() {
@@ -24,23 +26,12 @@ export function StudentDashboard() {
         title={`Welcome, ${user!.name.split(' ')[0]}`}
         description="Projects matched to your skills, and where your applications stand."
         actions={
-          <>
-            <Button variant="outline" asChild>
-              <Link to="/onboarding/student">Edit profile</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/projects">Browse projects</Link>
-            </Button>
-          </>
+          <Button asChild>
+            <Link to="/projects">Browse projects</Link>
+          </Button>
         }
       />
       <section aria-labelledby="recommended-heading" className="space-y-5">
-        <h2
-          id="recommended-heading"
-          className="font-display text-xl font-extrabold"
-        >
-          Recommended for you
-        </h2>
         <Recommendations />
       </section>
       <section aria-labelledby="applications-heading" className="space-y-5">
@@ -59,16 +50,55 @@ export function StudentDashboard() {
 function Recommendations() {
   const recs = useApi(() => api.students.recommendations(), []);
 
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2
+          id="recommended-heading"
+          className="font-display text-xl font-extrabold"
+        >
+          Recommended for you
+        </h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={recs.reload}
+          disabled={recs.loading}
+          aria-label="Refresh recommendations"
+        >
+          <RefreshCw className="size-4" aria-hidden />
+          {recs.loading ? 'Loading…' : 'Refresh'}
+        </Button>
+      </div>
+      <RecommendationResults recs={recs} />
+    </>
+  );
+}
+
+interface RecommendationResultsProps {
+  recs: ApiState<Paginated<StudentRecommendation>>;
+}
+
+function RecommendationResults({recs}: RecommendationResultsProps) {
+
   if (recs.loading && !recs.data) {
     return (
       <div
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="space-y-4"
         role="status"
         aria-label="Finding projects for you"
       >
-        {[0, 1, 2].map(i => (
-          <Skeleton key={i} className="h-72 rounded-2xl" />
-        ))}
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
+          Matching projects to your skills…
+        </p>
+        <ul className="space-y-4">
+          {[0, 1, 2].map(i => (
+            <li key={i}>
+              <MatchCardSkeleton orientation="row" />
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
@@ -83,17 +113,17 @@ function Recommendations() {
         description="Add skills to your profile so we can match you with projects, or browse everything that's open."
         action={
           <PillButton asChild size="sm">
-            <Link to="/onboarding/student">Add skills</Link>
+            <Link to="/settings">Add skills</Link>
           </PillButton>
         }
       />
     );
   }
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="space-y-4">
       {recs.data!.items.map(rec => (
         <li key={rec.project.id}>
-          <RecommendationCard recommendation={rec} />
+          <RecommendationCard recommendation={rec} orientation="row" />
         </li>
       ))}
     </ul>

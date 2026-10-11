@@ -22,16 +22,11 @@ export function OrgDashboard() {
         title={user!.name}
         description="Your submitted challenges and their AI briefs."
         actions={
-          <>
-            <Button variant="outline" asChild className="rounded-full">
-              <Link to="/onboarding/org">Edit profile</Link>
-            </Button>
-            <Button asChild className="rounded-full">
-              <Link to="/org/projects/new">
-                <Plus aria-hidden /> New challenge
-              </Link>
-            </Button>
-          </>
+          <Button asChild className="rounded-full">
+            <Link to="/org/projects/new">
+              <Plus aria-hidden /> New challenge
+            </Link>
+          </Button>
         }
       />
 

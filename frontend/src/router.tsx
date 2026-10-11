@@ -11,6 +11,7 @@ import {OrgOnboarding} from './pages/onboarding/OrgOnboarding';
 import {Register} from './pages/Register';
 import {BrowseProjects} from './pages/projects/BrowseProjects';
 import {ProjectDetail} from './pages/projects/ProjectDetail';
+import {ApplyProject} from './pages/projects/ApplyProject';
 import {StudentDashboard} from './pages/student/StudentDashboard';
 import {StudentOnboarding} from './pages/onboarding/StudentOnboarding';
 import {Settings} from './pages/settings/Settings';
@@ -80,6 +81,14 @@ export const router = createBrowserRouter([
         ),
       },
       {path: 'projects', element: <BrowseProjects />},
+      {
+        path: 'projects/:id/apply',
+        element: (
+          <RequireRole role="student">
+            <ApplyProject />
+          </RequireRole>
+        ),
+      },
       {path: 'projects/:id', element: <ProjectDetail />},
       {path: '*', element: <NotFound />},
     ],

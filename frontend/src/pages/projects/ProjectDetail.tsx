@@ -1,26 +1,17 @@
-import {useState, type ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {Link, useLocation, useParams} from 'react-router';
-import {
-  ArrowLeft,
-  CalendarDays,
-  Compass,
-  PartyPopper,
-  Sparkles,
-  Tag,
-} from 'lucide-react';
+import {ArrowLeft, Compass, PartyPopper} from 'lucide-react';
 import * as api from '../../api';
 import {useAuth} from '../../auth/AuthContext';
 import {EmptyState} from '../../components/EmptyState';
 import {ErrorState} from '../../components/ErrorState';
-import {BriefView} from '../../components/project/BriefView';
-import {ProjectStatusBadge} from '../../components/project/ProjectStatusBadge';
-import {ApplyDialog} from '../../components/proposals/ApplyDialog';
+import {ProjectOverview} from '../../components/project/ProjectOverview';
+import {PillButton} from '../../components/PillButton';
 import {ProposalStatusBadge} from '../../components/proposals/ProposalStatusBadge';
 import {Button} from '../../components/ui/button';
 import {Skeleton} from '../../components/ui/skeleton';
 import {useApi} from '../../hooks/useApi';
-import {formatDate} from '../../lib/format';
-import type {Project, ProposalStatus} from '../../types/api';
+import type {Project} from '../../types/api';
 
 /** A project's public page: its brief, and a way for students to apply. */
 export function ProjectDetail() {
@@ -70,54 +61,9 @@ interface ProjectBodyProps {
 }
 
 function ProjectBody({project}: ProjectBodyProps) {
-  const deadline = formatDate(project.deadline);
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-      <div className="min-w-0 space-y-8">
-        <header>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-[28px] leading-[1.05] font-extrabold text-balance sm:text-[34px]">
-              {project.title}
-            </h1>
-            <ProjectStatusBadge status={project.status} />
-          </div>
-          <p className="mt-2 text-muted-foreground">
-            {project.organization.companyName}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-[13px] text-muted-foreground tabular-nums">
-            {project.category && (
-              <span className="flex items-center gap-1.5">
-                <Tag className="size-4" aria-hidden /> {project.category}
-              </span>
-            )}
-            {deadline && (
-              <span className="flex items-center gap-1.5">
-                <CalendarDays className="size-4" aria-hidden /> Due {deadline}
-              </span>
-            )}
-          </div>
-        </header>
-        <section
-          aria-labelledby="about-heading"
-          className="rounded-2xl border bg-card p-5 sm:p-6"
-        >
-          <h2 id="about-heading" className="eyebrow text-primary">
-            In the organization’s words
-          </h2>
-          <p className="mt-2 whitespace-pre-line text-muted-foreground">
-            {project.description}
-          </p>
-        </section>
-        {project.brief ? (
-          <BriefView brief={project.brief} />
-        ) : (
-          <EmptyState
-            icon={Sparkles}
-            title="Brief coming soon"
-            description="The organization hasn’t generated this project’s brief yet."
-          />
-        )}
-      </div>
+      <ProjectOverview project={project} />
       <aside className="lg:sticky lg:top-24">
         <ApplyPanel project={project} />
       </aside>
@@ -139,9 +85,8 @@ function ApplyPanel({project}: ApplyPanelProps) {
       isStudent ? api.students.myProposals() : Promise.resolve({items: []}),
     [user?.id],
   );
-  const [justApplied, setJustApplied] = useState<ProposalStatus>();
   const existing = proposals.data?.items.find(p => p.project.id === project.id);
-  const status = justApplied ?? existing?.status;
+  const status = existing?.status;
 
   let body: ReactNode;
   if (!user) {
@@ -179,6 +124,8 @@ function ApplyPanel({project}: ApplyPanelProps) {
     );
   } else if (proposals.loading && !proposals.data) {
     body = <Skeleton className="h-12 rounded-full" />;
+  } else if (proposals.error) {
+    body = <ErrorState error={proposals.error} onRetry={proposals.reload} />;
   } else if (status === 'accepted') {
     body = (
       <div className="space-y-2 rounded-xl bg-success-surface p-4">
@@ -206,11 +153,9 @@ function ApplyPanel({project}: ApplyPanelProps) {
     );
   } else {
     body = (
-      <ApplyDialog
-        projectId={project.id}
-        projectTitle={project.title}
-        onApplied={proposal => setJustApplied(proposal.status)}
-      />
+      <PillButton asChild className="w-full">
+        <Link to={`/projects/${project.id}/apply`}>Apply to this project</Link>
+      </PillButton>
     );
   }
 

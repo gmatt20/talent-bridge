@@ -1,17 +1,9 @@
 import {ApiError} from './errors';
-import {createRequestCache} from './requestCache';
 
 export {ApiError};
 
 const TOKEN_KEY = 'tb.token';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
-const responseCache = createRequestCache();
-let cacheToken: string | null = null;
-
-/** Invalidates saved responses and detaches older in-flight reads. */
-export function invalidateRequestCache() {
-  responseCache.clear();
-}
 
 // Absolute backend origin (e.g. the deployed API). When empty, requests use
 // relative paths and rely on the Vite dev proxy. Trailing slash is trimmed so
@@ -29,8 +21,6 @@ export function getToken(): string | null {
 
 /** Stores the session token; null signs out. */
 export function setToken(token: string | null) {
-  invalidateRequestCache();
-  cacheToken = token;
   try {
     if (token) {
       localStorage.setItem(TOKEN_KEY, token);
@@ -44,11 +34,6 @@ export function setToken(token: string | null) {
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-/** Optional freshness window for GET responses; pending reads always deduplicate. */
-export interface RequestOptions {
-  maxAgeMs?: number;
-}
-
 /**
  * Sends a request to the API (or to the in-browser mocks when
  * `VITE_USE_MOCKS=true`) with the session token, and returns the parsed JSON.
@@ -58,35 +43,9 @@ export async function request<T>(
   method: Method,
   path: string,
   body?: unknown,
-  options: RequestOptions = {},
 ): Promise<T> {
   const token = getToken();
-  if (token !== cacheToken) {
-    invalidateRequestCache();
-    cacheToken = token;
-  }
 
-  if (method === 'GET') {
-    return responseCache.read(
-      path,
-      () => sendRequest<T>(method, path, body, token),
-      options.maxAgeMs,
-    );
-  }
-
-  const data = await sendRequest<T>(method, path, body, token);
-  // Profile edits, applications, and project changes affect multiple views.
-  // Clear all reads after a successful write so the next visit is fresh.
-  invalidateRequestCache();
-  return data;
-}
-
-async function sendRequest<T>(
-  method: Method,
-  path: string,
-  body: unknown,
-  token: string | null,
-): Promise<T> {
   if (USE_MOCKS) {
     const {mockRequest} = await import('./mocks/handlers');
     return mockRequest<T>(method, path, body, token);

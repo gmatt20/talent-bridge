@@ -27,8 +27,6 @@ export function recommendations() {
   return request<Paginated<StudentRecommendation>>(
     'GET',
     '/api/students/me/recommendations',
-    undefined,
-    {maxAgeMs: 2 * 60_000},
   );
 }
 
@@ -40,7 +38,5 @@ export function myProposals() {
   return request<Paginated<ProposalWithProject>>(
     'GET',
     '/api/students/me/proposals',
-    undefined,
-    {maxAgeMs: 30_000},
   );
 }

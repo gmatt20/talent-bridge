@@ -1,5 +1,4 @@
 import {useEffect, useState, type DependencyList} from 'react';
-import {invalidateRequestCache} from '../api/client';
 
 /** The result of {@link useApi}: the latest data or error, and reload. */
 export interface ApiState<T> {
@@ -40,11 +39,5 @@ export function useApi<T>(
     // `fn` is recreated every render; callers list what it depends on in `deps`.
   }, [...deps, nonce]);
 
-  return {
-    ...state,
-    reload: () => {
-      invalidateRequestCache();
-      setNonce(n => n + 1);
-    },
-  };
+  return {...state, reload: () => setNonce(n => n + 1)};
 }

@@ -34,8 +34,6 @@ export function recommendations(id: number) {
   return request<ProjectRecommendations>(
     'GET',
     `/api/projects/${id}/recommendations`,
-    undefined,
-    {maxAgeMs: 2 * 60_000},
   );
 }
 
